@@ -6136,19 +6136,11 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
-var $author$project$Ranking$idToString = function (_v0) {
-	var id = _v0.a;
-	return $elm$core$String$fromInt(id);
-};
 var $author$project$Ranking$Ranking = F4(
-	function (id, title, authorName, authorUrl) {
-		return {authorName: authorName, authorUrl: authorUrl, id: id, title: title};
+	function (id, active, name, desc) {
+		return {active: active, desc: desc, id: id, name: name};
 	});
-var $author$project$Ranking$RankingId = function (a) {
-	return {$: 'RankingId', a: a};
-};
-var $elm$json$Json$Decode$int = _Json_decodeInt;
-var $author$project$Ranking$idDecoder = A2($elm$json$Json$Decode$map, $author$project$Ranking$RankingId, $elm$json$Json$Decode$int);
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$custom = $elm$json$Json$Decode$map2($elm$core$Basics$apR);
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
@@ -6161,20 +6153,20 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 var $elm$json$Json$Decode$string = _Json_decodeString;
 var $author$project$Ranking$rankingDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-	'authorUrl',
+	'RANKINGDESC',
 	$elm$json$Json$Decode$string,
 	A3(
 		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-		'authorName',
+		'RANKINGNAME',
 		$elm$json$Json$Decode$string,
 		A3(
 			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-			'title',
-			$elm$json$Json$Decode$string,
+			'ACTIVE',
+			$elm$json$Json$Decode$bool,
 			A3(
 				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
-				'id',
-				$author$project$Ranking$idDecoder,
+				'RANKINGID',
+				$elm$json$Json$Decode$string,
 				$elm$json$Json$Decode$succeed($author$project$Ranking$Ranking)))));
 var $author$project$Page$EditRanking$fetchPost = function (postId) {
 	return $elm$http$Http$get(
@@ -6183,7 +6175,7 @@ var $author$project$Page$EditRanking$fetchPost = function (postId) {
 				$elm$http$Http$expectJson,
 				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$EditRanking$PostReceived),
 				$author$project$Ranking$rankingDecoder),
-			url: 'http://localhost:5019/posts/' + $author$project$Ranking$idToString(postId)
+			url: 'http://localhost:5019/posts/' + ('Ranking.idToString' + 'postId')
 		});
 };
 var $krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
@@ -6207,15 +6199,11 @@ var $author$project$Page$ListRankings$fetchRankings = $elm$http$Http$get(
 			$elm$http$Http$expectJson,
 			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListRankings$RankingsReceived),
 			$author$project$Ranking$rankingsDecoder),
-		url: 'http://localhost:5019/posts/'
+		url: 'https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest'
 	});
 var $author$project$Page$ListRankings$initialModel = {deleteError: $elm$core$Maybe$Nothing, rankings: $krisajenkins$remotedata$RemoteData$Loading};
 var $author$project$Page$ListRankings$init = _Utils_Tuple2($author$project$Page$ListRankings$initialModel, $author$project$Page$ListRankings$fetchRankings);
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Ranking$emptyPostId = $author$project$Ranking$RankingId(-1);
-var $author$project$Page$NewRanking$emptyPost = {authorName: '', authorUrl: '', id: $author$project$Ranking$emptyPostId, title: ''};
+var $author$project$Page$NewRanking$emptyPost = {active: false, desc: '', id: 'emptyRankingId', name: ''};
 var $author$project$Page$NewRanking$initialModel = function (navKey) {
 	return {createError: $elm$core$Maybe$Nothing, navKey: navKey, post: $author$project$Page$NewRanking$emptyPost};
 };
@@ -6270,9 +6258,6 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 };
 var $author$project$Route$NotFound = {$: 'NotFound'};
 var $author$project$Route$NewRanking = {$: 'NewRanking'};
-var $author$project$Route$Ranking = function (a) {
-	return {$: 'Ranking', a: a};
-};
 var $author$project$Route$Rankings = {$: 'Rankings'};
 var $elm$url$Url$Parser$Parser = function (a) {
 	return {$: 'Parser', a: a};
@@ -6280,58 +6265,6 @@ var $elm$url$Url$Parser$Parser = function (a) {
 var $elm$url$Url$Parser$State = F5(
 	function (visited, unvisited, params, frag, value) {
 		return {frag: frag, params: params, unvisited: unvisited, value: value, visited: visited};
-	});
-var $elm$url$Url$Parser$custom = F2(
-	function (tipe, stringToSomething) {
-		return $elm$url$Url$Parser$Parser(
-			function (_v0) {
-				var visited = _v0.visited;
-				var unvisited = _v0.unvisited;
-				var params = _v0.params;
-				var frag = _v0.frag;
-				var value = _v0.value;
-				if (!unvisited.b) {
-					return _List_Nil;
-				} else {
-					var next = unvisited.a;
-					var rest = unvisited.b;
-					var _v2 = stringToSomething(next);
-					if (_v2.$ === 'Just') {
-						var nextValue = _v2.a;
-						return _List_fromArray(
-							[
-								A5(
-								$elm$url$Url$Parser$State,
-								A2($elm$core$List$cons, next, visited),
-								rest,
-								params,
-								frag,
-								value(nextValue))
-							]);
-					} else {
-						return _List_Nil;
-					}
-				}
-			});
-	});
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Ranking$idParser = A2(
-	$elm$url$Url$Parser$custom,
-	'POSTID',
-	function (postId) {
-		return A2(
-			$elm$core$Maybe$map,
-			$author$project$Ranking$RankingId,
-			$elm$core$String$toInt(postId));
 	});
 var $elm$url$Url$Parser$mapState = F2(
 	function (func, _v0) {
@@ -6444,13 +6377,6 @@ var $author$project$Route$matchRoute = $elm$url$Url$Parser$oneOf(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$Rankings,
 			$elm$url$Url$Parser$s('posts')),
-			A2(
-			$elm$url$Url$Parser$map,
-			$author$project$Route$Ranking,
-			A2(
-				$elm$url$Url$Parser$slash,
-				$elm$url$Url$Parser$s('posts'),
-				$author$project$Ranking$idParser)),
 			A2(
 			$elm$url$Url$Parser$map,
 			$author$project$Route$NewRanking,
@@ -6683,7 +6609,7 @@ var $author$project$Route$routeToString = function (route) {
 			return '/posts';
 		case 'Ranking':
 			var postId = route.a;
-			return '/posts/' + $author$project$Ranking$idToString(postId);
+			return '/posts/' + 'postId';
 		default:
 			return '/posts/new';
 	}
@@ -6704,11 +6630,7 @@ var $elm$http$Http$jsonBody = function (value) {
 		'application/json',
 		A2($elm$json$Json$Encode$encode, 0, value));
 };
-var $elm$json$Json$Encode$int = _Json_wrap;
-var $author$project$Ranking$encodeId = function (_v0) {
-	var id = _v0.a;
-	return $elm$json$Json$Encode$int(id);
-};
+var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -6723,28 +6645,28 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Ranking$rankingEncoder = function (post) {
+var $author$project$Ranking$rankingEncoder = function (ranking) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'id',
-				$author$project$Ranking$encodeId(post.id)),
+				'RANKINGID',
+				$elm$json$Json$Encode$string(ranking.id)),
 				_Utils_Tuple2(
-				'title',
-				$elm$json$Json$Encode$string(post.title)),
+				'ACTIVE',
+				$elm$json$Json$Encode$bool(ranking.active)),
 				_Utils_Tuple2(
-				'authorName',
-				$elm$json$Json$Encode$string(post.authorName)),
+				'RANKINGNAME',
+				$elm$json$Json$Encode$string(ranking.name)),
 				_Utils_Tuple2(
-				'authorUrl',
-				$elm$json$Json$Encode$string(post.authorUrl))
+				'RANKINGDESC',
+				$elm$json$Json$Encode$string(ranking.desc))
 			]));
 };
 var $author$project$Page$EditRanking$savePost = function (post) {
 	if (post.$ === 'Success') {
 		var postData = post.a;
-		var postUrl = 'http://localhost:5019/posts/' + $author$project$Ranking$idToString(postData.id);
+		var postUrl = 'http://localhost:5019/posts/' + ('Ranking.idToString' + postData.id);
 		return $elm$http$Http$request(
 			{
 				body: $elm$http$Http$jsonBody(
@@ -6778,7 +6700,7 @@ var $author$project$Page$EditRanking$update = F2(
 					function (postData) {
 						return _Utils_update(
 							postData,
-							{title: newTitle});
+							{active: newTitle});
 					},
 					model.post);
 				return _Utils_Tuple2(
@@ -6793,7 +6715,7 @@ var $author$project$Page$EditRanking$update = F2(
 					function (postData) {
 						return _Utils_update(
 							postData,
-							{authorName: newName});
+							{name: newName});
 					},
 					model.post);
 				return _Utils_Tuple2(
@@ -6808,7 +6730,7 @@ var $author$project$Page$EditRanking$update = F2(
 					function (postData) {
 						return _Utils_update(
 							postData,
-							{authorUrl: newUrl});
+							{desc: newUrl});
 					},
 					model.post);
 				return _Utils_Tuple2(
@@ -6860,7 +6782,7 @@ var $author$project$Page$ListRankings$deleteRanking = function (rankingId) {
 			method: 'DELETE',
 			timeout: $elm$core$Maybe$Nothing,
 			tracker: $elm$core$Maybe$Nothing,
-			url: 'http://localhost:5019/posts/' + $author$project$Ranking$idToString(rankingId)
+			url: 'http://localhost:5019/posts/' + 'rankingId.id'
 		});
 };
 var $author$project$Page$ListRankings$update = F2(
@@ -6903,19 +6825,19 @@ var $author$project$Page$ListRankings$update = F2(
 var $author$project$Page$NewRanking$PostCreated = function (a) {
 	return {$: 'PostCreated', a: a};
 };
-var $author$project$Ranking$newPostEncoder = function (post) {
+var $author$project$Ranking$newPostEncoder = function (ranking) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
 				_Utils_Tuple2(
-				'title',
-				$elm$json$Json$Encode$string(post.title)),
+				'ACTIVE',
+				$elm$json$Json$Encode$bool(ranking.active)),
 				_Utils_Tuple2(
-				'authorName',
-				$elm$json$Json$Encode$string(post.authorName)),
+				'RANKINGNAME',
+				$elm$json$Json$Encode$string(ranking.name)),
 				_Utils_Tuple2(
-				'authorUrl',
-				$elm$json$Json$Encode$string(post.authorUrl))
+				'RANKINGDESC',
+				$elm$json$Json$Encode$string(ranking.desc))
 			]));
 };
 var $elm$http$Http$post = function (r) {
@@ -6939,7 +6861,7 @@ var $author$project$Page$NewRanking$update = F2(
 				var oldPost = model.post;
 				var updateTitle = _Utils_update(
 					oldPost,
-					{title: title});
+					{active: true});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -6950,7 +6872,7 @@ var $author$project$Page$NewRanking$update = F2(
 				var oldPost = model.post;
 				var updateAuthorName = _Utils_update(
 					oldPost,
-					{authorName: name});
+					{name: name});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -6961,7 +6883,7 @@ var $author$project$Page$NewRanking$update = F2(
 				var oldPost = model.post;
 				var updateAuthorUrl = _Utils_update(
 					oldPost,
-					{authorUrl: url});
+					{desc: url});
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -7098,9 +7020,6 @@ var $author$project$Page$EditRanking$UpdateAuthorName = function (a) {
 var $author$project$Page$EditRanking$UpdateAuthorUrl = function (a) {
 	return {$: 'UpdateAuthorUrl', a: a};
 };
-var $author$project$Page$EditRanking$UpdateTitle = function (a) {
-	return {$: 'UpdateTitle', a: a};
-};
 var $elm$html$Html$br = _VirtualDom_node('br');
 var $elm$html$Html$button = _VirtualDom_node('button');
 var $elm$html$Html$form = _VirtualDom_node('form');
@@ -7180,8 +7099,7 @@ var $author$project$Page$EditRanking$editForm = function (post) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$value(post.title),
-								$elm$html$Html$Events$onInput($author$project$Page$EditRanking$UpdateTitle)
+								$elm$html$Html$Attributes$value(post.name)
 							]),
 						_List_Nil)
 					])),
@@ -7198,7 +7116,7 @@ var $author$project$Page$EditRanking$editForm = function (post) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$value(post.authorName),
+								$elm$html$Html$Attributes$value(post.name),
 								$elm$html$Html$Events$onInput($author$project$Page$EditRanking$UpdateAuthorName)
 							]),
 						_List_Nil)
@@ -7216,7 +7134,7 @@ var $author$project$Page$EditRanking$editForm = function (post) {
 						_List_fromArray(
 							[
 								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$value(post.authorUrl),
+								$elm$html$Html$Attributes$value(post.desc),
 								$elm$html$Html$Events$onInput($author$project$Page$EditRanking$UpdateAuthorUrl)
 							]),
 						_List_Nil)
@@ -7365,10 +7283,13 @@ var $author$project$Page$ListRankings$viewFetchError = function (errorMessage) {
 				$elm$html$Html$text('Error: ' + errorMessage)
 			]));
 };
-var $author$project$Page$ListRankings$DeleteRanking = function (a) {
-	return {$: 'DeleteRanking', a: a};
+var $author$project$Page$ListRankings$boolToString = function (bool) {
+	if (bool) {
+		return 'True';
+	} else {
+		return 'False';
+	}
 };
-var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
 		return A2(
@@ -7380,7 +7301,7 @@ var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('h
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Page$ListRankings$viewRanking = function (ranking) {
-	var rankingPath = '/posts/' + $author$project$Ranking$idToString(ranking.id);
+	var rankingPath = '/posts/' + ranking.id;
 	return A2(
 		$elm$html$Html$tr,
 		_List_Nil,
@@ -7390,19 +7311,19 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 				$elm$html$Html$td,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$hidden(false)
+						$elm$html$Html$Attributes$hidden(true)
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text(
-						$author$project$Ranking$idToString(ranking.id))
+						$elm$html$Html$text(ranking.id)
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(ranking.title)
+						$elm$html$Html$text(
+						$author$project$Page$ListRankings$boolToString(ranking.active))
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7413,11 +7334,11 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 						$elm$html$Html$a,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$href(ranking.authorUrl)
+								$elm$html$Html$Attributes$href(ranking.name)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(ranking.authorName)
+								$elm$html$Html$text(ranking.name)
 							]))
 					])),
 				A2(
@@ -7441,18 +7362,7 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('button'),
-								$elm$html$Html$Events$onClick(
-								$author$project$Page$ListRankings$DeleteRanking(ranking.id))
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Delete')
-							]))
+						$elm$html$Html$text('Delete')
 					]))
 			]));
 };

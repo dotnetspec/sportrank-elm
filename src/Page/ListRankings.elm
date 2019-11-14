@@ -35,14 +35,36 @@ initialModel =
     }
 
 
+
+-- Original:
+-- fetchRankings : Cmd Msg
+-- fetchRankings =
+--     Http.get
+--         { url = "http://localhost:5019/posts/"
+--         , expect =
+--             rankingsDecoder
+--                 |> Http.expectJson (RemoteData.fromResult >> RankingsReceived)
+--         }
+
+
 fetchRankings : Cmd Msg
 fetchRankings =
     Http.get
-        { url = "http://localhost:5019/posts/"
+        { url = "https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest"
         , expect =
             rankingsDecoder
                 |> Http.expectJson (RemoteData.fromResult >> RankingsReceived)
         }
+
+
+
+--
+-- httpCommand : Cmd Msg
+-- httpCommand =
+--     Http.get
+--         { url = "https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest"
+--         , expect = Http.expectJson DataReceived (list postDecoder)
+--         }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -71,7 +93,7 @@ deleteRanking rankingId =
     Http.request
         { method = "DELETE"
         , headers = []
-        , url = "http://localhost:5019/posts/" ++ Ranking.idToString rankingId
+        , url = "http://localhost:5019/posts/" ++ "rankingId.id"
         , body = Http.emptyBody
         , expect = Http.expectString RankingDeleted
         , timeout = Nothing
@@ -137,22 +159,33 @@ viewRanking : Ranking -> Html Msg
 viewRanking ranking =
     let
         rankingPath =
-            "/posts/" ++ Ranking.idToString ranking.id
+            "/posts/" ++ ranking.id
     in
     tr []
-        [ td [ hidden False ]
-            [ text (Ranking.idToString ranking.id) ]
+        [ td [ hidden True ]
+            [ text ranking.id ]
         , td []
-            [ text ranking.title ]
+            [ text (boolToString ranking.active) ]
         , td []
-            [ a [ href ranking.authorUrl ] [ text ranking.authorName ] ]
+            [ a [ href ranking.name ] [ text ranking.name ] ]
         , td []
             [ a [ href rankingPath ] [ text "Edit" ] ]
         , td []
-            [ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
-                [ text "Delete" ]
-            ]
+            --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
+            [ text "Delete" ]
+
+        --]
         ]
+
+
+boolToString : Bool -> String
+boolToString bool =
+    case bool of
+        True ->
+            "True"
+
+        False ->
+            "False"
 
 
 viewFetchError : String -> Html Msg

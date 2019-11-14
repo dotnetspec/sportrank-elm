@@ -28,7 +28,8 @@ matchRoute =
     oneOf
         [ map Rankings top
         , map Rankings (s "posts")
-        , map Ranking (s "posts" </> Ranking.idParser)
+
+        --, map Ranking (s "posts" </> "Ranking.idParser")
         , map NewRanking (s "posts" </> s "new")
         ]
 
@@ -49,7 +50,7 @@ routeToString route =
             "/posts"
 
         Ranking postId ->
-            "/posts/" ++ Ranking.idToString postId
+            "/posts/" ++ "postId"
 
         NewRanking ->
             "/posts/new"

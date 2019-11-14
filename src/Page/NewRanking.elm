@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Ranking exposing (Ranking, RankingId, emptyPostId, newPostEncoder, rankingDecoder)
+import Ranking exposing (Ranking, RankingId, emptyRankingId, newPostEncoder, rankingDecoder)
 import Route
 
 
@@ -97,7 +97,7 @@ update msg model =
                     model.post
 
                 updateTitle =
-                    { oldPost | title = title }
+                    { oldPost | active = True }
             in
             ( { model | post = updateTitle }, Cmd.none )
 
@@ -107,7 +107,7 @@ update msg model =
                     model.post
 
                 updateAuthorName =
-                    { oldPost | authorName = name }
+                    { oldPost | name = name }
             in
             ( { model | post = updateAuthorName }, Cmd.none )
 
@@ -117,7 +117,7 @@ update msg model =
                     model.post
 
                 updateAuthorUrl =
-                    { oldPost | authorUrl = url }
+                    { oldPost | desc = url }
             in
             ( { model | post = updateAuthorUrl }, Cmd.none )
 
@@ -146,10 +146,10 @@ createPost post =
 
 emptyPost : Ranking
 emptyPost =
-    { id = emptyPostId
-    , title = ""
-    , authorName = ""
-    , authorUrl = ""
+    { id = "emptyRankingId"
+    , active = False
+    , name = ""
+    , desc = ""
     }
 
 

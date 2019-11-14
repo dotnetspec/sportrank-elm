@@ -34,7 +34,7 @@ initialModel navKey =
 fetchPost : RankingId -> Cmd Msg
 fetchPost postId =
     Http.get
-        { url = "http://localhost:5019/posts/" ++ Ranking.idToString postId
+        { url = "http://localhost:5019/posts/" ++ "Ranking.idToString" ++ "postId"
         , expect =
             rankingDecoder
                 |> Http.expectJson (RemoteData.fromResult >> PostReceived)
@@ -43,7 +43,7 @@ fetchPost postId =
 
 type Msg
     = PostReceived (WebData Ranking)
-    | UpdateTitle String
+    | UpdateTitle Bool
     | UpdateAuthorName String
     | UpdateAuthorUrl String
     | SavePost
@@ -61,7 +61,7 @@ update msg model =
                 updateTitle =
                     RemoteData.map
                         (\postData ->
-                            { postData | title = newTitle }
+                            { postData | active = newTitle }
                         )
                         model.post
             in
@@ -72,7 +72,7 @@ update msg model =
                 updateAuthorName =
                     RemoteData.map
                         (\postData ->
-                            { postData | authorName = newName }
+                            { postData | name = newName }
                         )
                         model.post
             in
@@ -83,7 +83,7 @@ update msg model =
                 updateAuthorUrl =
                     RemoteData.map
                         (\postData ->
-                            { postData | authorUrl = newUrl }
+                            { postData | desc = newUrl }
                         )
                         model.post
             in
@@ -114,7 +114,8 @@ savePost post =
             let
                 postUrl =
                     "http://localhost:5019/posts/"
-                        ++ Ranking.idToString postData.id
+                        ++ "Ranking.idToString"
+                        ++ postData.id
             in
             Http.request
                 { method = "PATCH"
@@ -163,8 +164,9 @@ editForm post =
             , br [] []
             , input
                 [ type_ "text"
-                , value post.title
-                , onInput UpdateTitle
+                , value post.name
+
+                --, onInput (boolToString UpdateTitle)
                 ]
                 []
             ]
@@ -174,7 +176,7 @@ editForm post =
             , br [] []
             , input
                 [ type_ "text"
-                , value post.authorName
+                , value post.name
                 , onInput UpdateAuthorName
                 ]
                 []
@@ -185,7 +187,7 @@ editForm post =
             , br [] []
             , input
                 [ type_ "text"
-                , value post.authorUrl
+                , value post.desc
                 , onInput UpdateAuthorUrl
                 ]
                 []
@@ -196,6 +198,17 @@ editForm post =
                 [ text "Submit" ]
             ]
         ]
+
+
+
+-- boolToString : (Bool -> Msg) -> (String -> msg)
+-- boolToString booltomsg =
+--     case booltomsg of
+--         "True" ->
+--             "True"
+--
+--         "False" ->
+--             "False"
 
 
 viewFetchError : String -> Html Msg
