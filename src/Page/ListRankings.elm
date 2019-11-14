@@ -35,18 +35,6 @@ initialModel =
     }
 
 
-
--- Original:
--- fetchRankings : Cmd Msg
--- fetchRankings =
---     Http.get
---         { url = "http://localhost:5019/posts/"
---         , expect =
---             rankingsDecoder
---                 |> Http.expectJson (RemoteData.fromResult >> RankingsReceived)
---         }
-
-
 fetchRankings : Cmd Msg
 fetchRankings =
     Http.get
@@ -55,16 +43,6 @@ fetchRankings =
             rankingsDecoder
                 |> Http.expectJson (RemoteData.fromResult >> RankingsReceived)
         }
-
-
-
---
--- httpCommand : Cmd Msg
--- httpCommand =
---     Http.get
---         { url = "https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest"
---         , expect = Http.expectJson DataReceived (list postDecoder)
---         }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -149,9 +127,11 @@ viewTableHeader =
         [ th [ hidden False ]
             [ text "ID" ]
         , th []
-            [ text "Title" ]
+            [ text "Active" ]
         , th []
-            [ text "Author" ]
+            [ text "Ranking" ]
+        , th []
+            [ text "Description" ]
         ]
 
 
@@ -162,7 +142,7 @@ viewRanking ranking =
             "/posts/" ++ ranking.id
     in
     tr []
-        [ td [ hidden True ]
+        [ td [ hidden False ]
             [ text ranking.id ]
         , td []
             [ text (boolToString ranking.active) ]

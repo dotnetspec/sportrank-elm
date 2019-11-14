@@ -200,17 +200,6 @@ editForm post =
         ]
 
 
-
--- boolToString : (Bool -> Msg) -> (String -> msg)
--- boolToString booltomsg =
---     case booltomsg of
---         "True" ->
---             "True"
---
---         "False" ->
---             "False"
-
-
 viewFetchError : String -> Html Msg
 viewFetchError errorMessage =
     let

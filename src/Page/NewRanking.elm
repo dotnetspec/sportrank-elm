@@ -151,9 +151,3 @@ emptyPost =
     , name = ""
     , desc = ""
     }
-
-
-
--- emptyPostId : RankingId
--- emptyPostId =
---     RankingId -1
