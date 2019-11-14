@@ -1,4 +1,4 @@
-module Ranking exposing (Ranking, RankingId, emptyPostId, idParser, idToString, newPostEncoder, postDecoder, postEncoder, postsDecoder)
+module Ranking exposing (Ranking, RankingId, emptyPostId, idParser, idToString, newPostEncoder, rankingDecoder, rankingEncoder, rankingsDecoder)
 
 import Json.Decode as Decode exposing (Decoder, int, list, string)
 import Json.Decode.Pipeline exposing (required)
@@ -18,13 +18,13 @@ type RankingId
     = RankingId Int
 
 
-postsDecoder : Decoder (List Ranking)
-postsDecoder =
-    list postDecoder
+rankingsDecoder : Decoder (List Ranking)
+rankingsDecoder =
+    list rankingDecoder
 
 
-postDecoder : Decoder Ranking
-postDecoder =
+rankingDecoder : Decoder Ranking
+rankingDecoder =
     Decode.succeed Ranking
         |> required "id" idDecoder
         |> required "title" string
@@ -49,8 +49,8 @@ idParser =
             Maybe.map RankingId (String.toInt postId)
 
 
-postEncoder : Ranking -> Encode.Value
-postEncoder post =
+rankingEncoder : Ranking -> Encode.Value
+rankingEncoder post =
     Encode.object
         [ ( "id", encodeId post.id )
         , ( "title", Encode.string post.title )

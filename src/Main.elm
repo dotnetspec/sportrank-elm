@@ -91,7 +91,7 @@ initCurrentPage ( model, existingCmds ) =
 
 view : Model -> Document Msg
 view model =
-    { title = "Post App"
+    { title = "SportRank"
     , body = [ currentView model ]
     }
 

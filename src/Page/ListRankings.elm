@@ -6,21 +6,21 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
-import Ranking exposing (Ranking, RankingId, postsDecoder)
+import Ranking exposing (Ranking, RankingId, rankingsDecoder)
 import RemoteData exposing (WebData)
 
 
 type alias Model =
-    { posts : WebData (List Ranking)
+    { rankings : WebData (List Ranking)
     , deleteError : Maybe String
     }
 
 
 type Msg
     = FetchRankings
-    | PostsReceived (WebData (List Ranking))
-    | DeletePost RankingId
-    | PostDeleted (Result Http.Error String)
+    | RankingsReceived (WebData (List Ranking))
+    | DeleteRanking RankingId
+    | RankingDeleted (Result Http.Error String)
 
 
 init : ( Model, Cmd Msg )
@@ -30,7 +30,7 @@ init =
 
 initialModel : Model
 initialModel =
-    { posts = RemoteData.Loading
+    { rankings = RemoteData.Loading
     , deleteError = Nothing
     }
 
@@ -40,8 +40,8 @@ fetchRankings =
     Http.get
         { url = "http://localhost:5019/posts/"
         , expect =
-            postsDecoder
-                |> Http.expectJson (RemoteData.fromResult >> PostsReceived)
+            rankingsDecoder
+                |> Http.expectJson (RemoteData.fromResult >> RankingsReceived)
         }
 
 
@@ -49,31 +49,31 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         FetchRankings ->
-            ( { model | posts = RemoteData.Loading }, fetchRankings )
+            ( { model | rankings = RemoteData.Loading }, fetchRankings )
 
-        PostsReceived response ->
-            ( { model | posts = response }, Cmd.none )
+        RankingsReceived response ->
+            ( { model | rankings = response }, Cmd.none )
 
-        DeletePost postId ->
-            ( model, deletePost postId )
+        DeleteRanking rankingId ->
+            ( model, deleteRanking rankingId )
 
-        PostDeleted (Ok _) ->
+        RankingDeleted (Ok _) ->
             ( model, fetchRankings )
 
-        PostDeleted (Err error) ->
+        RankingDeleted (Err error) ->
             ( { model | deleteError = Just (buildErrorMessage error) }
             , Cmd.none
             )
 
 
-deletePost : RankingId -> Cmd Msg
-deletePost postId =
+deleteRanking : RankingId -> Cmd Msg
+deleteRanking rankingId =
     Http.request
         { method = "DELETE"
         , headers = []
-        , url = "http://localhost:5019/posts/" ++ Ranking.idToString postId
+        , url = "http://localhost:5019/posts/" ++ Ranking.idToString rankingId
         , body = Http.emptyBody
-        , expect = Http.expectString PostDeleted
+        , expect = Http.expectString RankingDeleted
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -91,30 +91,30 @@ view model =
         , br [] []
         , br [] []
         , button [ onClick FetchRankings ]
-            [ text "Refresh posts" ]
+            [ text "Refresh rankings" ]
         , br [] []
         , br [] []
         , a [ href "/posts/new" ]
-            [ text "Create new post" ]
-        , viewPosts model.posts
+            [ text "Create new ranking" ]
+        , viewRankings model.rankings
         , viewDeleteError model.deleteError
         ]
 
 
-viewPosts : WebData (List Ranking) -> Html Msg
-viewPosts posts =
-    case posts of
+viewRankings : WebData (List Ranking) -> Html Msg
+viewRankings rankings =
+    case rankings of
         RemoteData.NotAsked ->
             text ""
 
         RemoteData.Loading ->
             h3 [] [ text "Loading..." ]
 
-        RemoteData.Success actualPosts ->
+        RemoteData.Success actualRankings ->
             div []
-                [ h3 [] [ text "Posts" ]
+                [ h3 [] [ text "Rankings" ]
                 , table []
-                    ([ viewTableHeader ] ++ List.map viewPost actualPosts)
+                    ([ viewTableHeader ] ++ List.map viewRanking actualRankings)
                 ]
 
         RemoteData.Failure httpError ->
@@ -124,7 +124,7 @@ viewPosts posts =
 viewTableHeader : Html Msg
 viewTableHeader =
     tr []
-        [ th []
+        [ th [ hidden False ]
             [ text "ID" ]
         , th []
             [ text "Title" ]
@@ -133,23 +133,23 @@ viewTableHeader =
         ]
 
 
-viewPost : Ranking -> Html Msg
-viewPost post =
+viewRanking : Ranking -> Html Msg
+viewRanking ranking =
     let
-        postPath =
-            "/posts/" ++ Ranking.idToString post.id
+        rankingPath =
+            "/posts/" ++ Ranking.idToString ranking.id
     in
     tr []
-        [ td [ hidden True ]
-            [ text (Ranking.idToString post.id) ]
+        [ td [ hidden False ]
+            [ text (Ranking.idToString ranking.id) ]
         , td []
-            [ text post.title ]
+            [ text ranking.title ]
         , td []
-            [ a [ href post.authorUrl ] [ text post.authorName ] ]
+            [ a [ href ranking.authorUrl ] [ text ranking.authorName ] ]
         , td []
-            [ a [ href postPath ] [ text "Edit" ] ]
+            [ a [ href rankingPath ] [ text "Edit" ] ]
         , td []
-            [ button [ type_ "button", onClick (DeletePost post.id) ]
+            [ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
                 [ text "Delete" ]
             ]
         ]
@@ -159,7 +159,7 @@ viewFetchError : String -> Html Msg
 viewFetchError errorMessage =
     let
         errorHeading =
-            "Couldn't fetch posts at this time."
+            "Couldn't fetch rankings at this time."
     in
     div []
         [ h3 [] [ text errorHeading ]
@@ -172,7 +172,7 @@ viewDeleteError maybeError =
     case maybeError of
         Just error ->
             div []
-                [ h3 [] [ text "Couldn't delete post at this time." ]
+                [ h3 [] [ text "Couldn't delete ranking at this time." ]
                 , text ("Error: " ++ error)
                 ]
 

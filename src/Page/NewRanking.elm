@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Ranking exposing (Ranking, RankingId, emptyPostId, newPostEncoder, postDecoder)
+import Ranking exposing (Ranking, RankingId, emptyPostId, newPostEncoder, rankingDecoder)
 import Route
 
 
@@ -140,7 +140,7 @@ createPost post =
     Http.post
         { url = "http://localhost:5019/posts"
         , body = Http.jsonBody (newPostEncoder post)
-        , expect = Http.expectJson PostCreated postDecoder
+        , expect = Http.expectJson PostCreated rankingDecoder
         }
 
 

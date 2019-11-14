@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Ranking exposing (Ranking, RankingId, postDecoder, postEncoder)
+import Ranking exposing (Ranking, RankingId, rankingDecoder, rankingEncoder)
 import RemoteData exposing (WebData)
 import Route
 
@@ -36,7 +36,7 @@ fetchPost postId =
     Http.get
         { url = "http://localhost:5019/posts/" ++ Ranking.idToString postId
         , expect =
-            postDecoder
+            rankingDecoder
                 |> Http.expectJson (RemoteData.fromResult >> PostReceived)
         }
 
@@ -120,8 +120,8 @@ savePost post =
                 { method = "PATCH"
                 , headers = []
                 , url = postUrl
-                , body = Http.jsonBody (postEncoder postData)
-                , expect = Http.expectJson PostSaved postDecoder
+                , body = Http.jsonBody (rankingEncoder postData)
+                , expect = Http.expectJson PostSaved rankingDecoder
                 , timeout = Nothing
                 , tracker = Nothing
                 }

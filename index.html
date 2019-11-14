@@ -6159,7 +6159,7 @@ var $NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required = F3(
 			decoder);
 	});
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Ranking$postDecoder = A3(
+var $author$project$Ranking$rankingDecoder = A3(
 	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
 	'authorUrl',
 	$elm$json$Json$Decode$string,
@@ -6182,7 +6182,7 @@ var $author$project$Page$EditRanking$fetchPost = function (postId) {
 			expect: A2(
 				$elm$http$Http$expectJson,
 				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$EditRanking$PostReceived),
-				$author$project$Ranking$postDecoder),
+				$author$project$Ranking$rankingDecoder),
 			url: 'http://localhost:5019/posts/' + $author$project$Ranking$idToString(postId)
 		});
 };
@@ -6196,20 +6196,20 @@ var $author$project$Page$EditRanking$init = F2(
 			$author$project$Page$EditRanking$initialModel(navKey),
 			$author$project$Page$EditRanking$fetchPost(postId));
 	});
-var $author$project$Page$ListRankings$PostsReceived = function (a) {
-	return {$: 'PostsReceived', a: a};
+var $author$project$Page$ListRankings$RankingsReceived = function (a) {
+	return {$: 'RankingsReceived', a: a};
 };
 var $elm$json$Json$Decode$list = _Json_decodeList;
-var $author$project$Ranking$postsDecoder = $elm$json$Json$Decode$list($author$project$Ranking$postDecoder);
+var $author$project$Ranking$rankingsDecoder = $elm$json$Json$Decode$list($author$project$Ranking$rankingDecoder);
 var $author$project$Page$ListRankings$fetchRankings = $elm$http$Http$get(
 	{
 		expect: A2(
 			$elm$http$Http$expectJson,
-			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListRankings$PostsReceived),
-			$author$project$Ranking$postsDecoder),
+			A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ListRankings$RankingsReceived),
+			$author$project$Ranking$rankingsDecoder),
 		url: 'http://localhost:5019/posts/'
 	});
-var $author$project$Page$ListRankings$initialModel = {deleteError: $elm$core$Maybe$Nothing, posts: $krisajenkins$remotedata$RemoteData$Loading};
+var $author$project$Page$ListRankings$initialModel = {deleteError: $elm$core$Maybe$Nothing, rankings: $krisajenkins$remotedata$RemoteData$Loading};
 var $author$project$Page$ListRankings$init = _Utils_Tuple2($author$project$Page$ListRankings$initialModel, $author$project$Page$ListRankings$fetchRankings);
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -6723,7 +6723,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Ranking$postEncoder = function (post) {
+var $author$project$Ranking$rankingEncoder = function (post) {
 	return $elm$json$Json$Encode$object(
 		_List_fromArray(
 			[
@@ -6748,8 +6748,8 @@ var $author$project$Page$EditRanking$savePost = function (post) {
 		return $elm$http$Http$request(
 			{
 				body: $elm$http$Http$jsonBody(
-					$author$project$Ranking$postEncoder(postData)),
-				expect: A2($elm$http$Http$expectJson, $author$project$Page$EditRanking$PostSaved, $author$project$Ranking$postDecoder),
+					$author$project$Ranking$rankingEncoder(postData)),
+				expect: A2($elm$http$Http$expectJson, $author$project$Page$EditRanking$PostSaved, $author$project$Ranking$rankingDecoder),
 				headers: _List_Nil,
 				method: 'PATCH',
 				timeout: $elm$core$Maybe$Nothing,
@@ -6842,8 +6842,8 @@ var $author$project$Page$EditRanking$update = F2(
 				}
 		}
 	});
-var $author$project$Page$ListRankings$PostDeleted = function (a) {
-	return {$: 'PostDeleted', a: a};
+var $author$project$Page$ListRankings$RankingDeleted = function (a) {
+	return {$: 'RankingDeleted', a: a};
 };
 var $elm$http$Http$expectString = function (toMsg) {
 	return A2(
@@ -6851,16 +6851,16 @@ var $elm$http$Http$expectString = function (toMsg) {
 		toMsg,
 		$elm$http$Http$resolve($elm$core$Result$Ok));
 };
-var $author$project$Page$ListRankings$deletePost = function (postId) {
+var $author$project$Page$ListRankings$deleteRanking = function (rankingId) {
 	return $elm$http$Http$request(
 		{
 			body: $elm$http$Http$emptyBody,
-			expect: $elm$http$Http$expectString($author$project$Page$ListRankings$PostDeleted),
+			expect: $elm$http$Http$expectString($author$project$Page$ListRankings$RankingDeleted),
 			headers: _List_Nil,
 			method: 'DELETE',
 			timeout: $elm$core$Maybe$Nothing,
 			tracker: $elm$core$Maybe$Nothing,
-			url: 'http://localhost:5019/posts/' + $author$project$Ranking$idToString(postId)
+			url: 'http://localhost:5019/posts/' + $author$project$Ranking$idToString(rankingId)
 		});
 };
 var $author$project$Page$ListRankings$update = F2(
@@ -6870,20 +6870,20 @@ var $author$project$Page$ListRankings$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{posts: $krisajenkins$remotedata$RemoteData$Loading}),
+						{rankings: $krisajenkins$remotedata$RemoteData$Loading}),
 					$author$project$Page$ListRankings$fetchRankings);
-			case 'PostsReceived':
+			case 'RankingsReceived':
 				var response = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{posts: response}),
+						{rankings: response}),
 					$elm$core$Platform$Cmd$none);
-			case 'DeletePost':
-				var postId = msg.a;
+			case 'DeleteRanking':
+				var rankingId = msg.a;
 				return _Utils_Tuple2(
 					model,
-					$author$project$Page$ListRankings$deletePost(postId));
+					$author$project$Page$ListRankings$deleteRanking(rankingId));
 			default:
 				if (msg.a.$ === 'Ok') {
 					return _Utils_Tuple2(model, $author$project$Page$ListRankings$fetchRankings);
@@ -6927,7 +6927,7 @@ var $author$project$Page$NewRanking$createPost = function (post) {
 		{
 			body: $elm$http$Http$jsonBody(
 				$author$project$Ranking$newPostEncoder(post)),
-			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewRanking$PostCreated, $author$project$Ranking$postDecoder),
+			expect: A2($elm$http$Http$expectJson, $author$project$Page$NewRanking$PostCreated, $author$project$Ranking$rankingDecoder),
 			url: 'http://localhost:5019/posts'
 		});
 };
@@ -7339,7 +7339,7 @@ var $author$project$Page$ListRankings$viewDeleteError = function (maybeError) {
 					_List_Nil,
 					_List_fromArray(
 						[
-							$elm$html$Html$text('Couldn\'t delete post at this time.')
+							$elm$html$Html$text('Couldn\'t delete ranking at this time.')
 						])),
 					$elm$html$Html$text('Error: ' + error)
 				]));
@@ -7349,7 +7349,7 @@ var $author$project$Page$ListRankings$viewDeleteError = function (maybeError) {
 };
 var $elm$html$Html$table = _VirtualDom_node('table');
 var $author$project$Page$ListRankings$viewFetchError = function (errorMessage) {
-	var errorHeading = 'Couldn\'t fetch posts at this time.';
+	var errorHeading = 'Couldn\'t fetch rankings at this time.';
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -7365,8 +7365,8 @@ var $author$project$Page$ListRankings$viewFetchError = function (errorMessage) {
 				$elm$html$Html$text('Error: ' + errorMessage)
 			]));
 };
-var $author$project$Page$ListRankings$DeletePost = function (a) {
-	return {$: 'DeletePost', a: a};
+var $author$project$Page$ListRankings$DeleteRanking = function (a) {
+	return {$: 'DeleteRanking', a: a};
 };
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -7379,8 +7379,8 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('hidden');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Page$ListRankings$viewPost = function (post) {
-	var postPath = '/posts/' + $author$project$Ranking$idToString(post.id);
+var $author$project$Page$ListRankings$viewRanking = function (ranking) {
+	var rankingPath = '/posts/' + $author$project$Ranking$idToString(ranking.id);
 	return A2(
 		$elm$html$Html$tr,
 		_List_Nil,
@@ -7390,19 +7390,19 @@ var $author$project$Page$ListRankings$viewPost = function (post) {
 				$elm$html$Html$td,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$hidden(true)
+						$elm$html$Html$Attributes$hidden(false)
 					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
-						$author$project$Ranking$idToString(post.id))
+						$author$project$Ranking$idToString(ranking.id))
 					])),
 				A2(
 				$elm$html$Html$td,
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text(post.title)
+						$elm$html$Html$text(ranking.title)
 					])),
 				A2(
 				$elm$html$Html$td,
@@ -7413,11 +7413,11 @@ var $author$project$Page$ListRankings$viewPost = function (post) {
 						$elm$html$Html$a,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$href(post.authorUrl)
+								$elm$html$Html$Attributes$href(ranking.authorUrl)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(post.authorName)
+								$elm$html$Html$text(ranking.authorName)
 							]))
 					])),
 				A2(
@@ -7429,7 +7429,7 @@ var $author$project$Page$ListRankings$viewPost = function (post) {
 						$elm$html$Html$a,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$href(postPath)
+								$elm$html$Html$Attributes$href(rankingPath)
 							]),
 						_List_fromArray(
 							[
@@ -7447,7 +7447,7 @@ var $author$project$Page$ListRankings$viewPost = function (post) {
 							[
 								$elm$html$Html$Attributes$type_('button'),
 								$elm$html$Html$Events$onClick(
-								$author$project$Page$ListRankings$DeletePost(post.id))
+								$author$project$Page$ListRankings$DeleteRanking(ranking.id))
 							]),
 						_List_fromArray(
 							[
@@ -7464,7 +7464,10 @@ var $author$project$Page$ListRankings$viewTableHeader = A2(
 		[
 			A2(
 			$elm$html$Html$th,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$hidden(false)
+				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text('ID')
@@ -7484,8 +7487,8 @@ var $author$project$Page$ListRankings$viewTableHeader = A2(
 					$elm$html$Html$text('Author')
 				]))
 		]));
-var $author$project$Page$ListRankings$viewPosts = function (posts) {
-	switch (posts.$) {
+var $author$project$Page$ListRankings$viewRankings = function (rankings) {
+	switch (rankings.$) {
 		case 'NotAsked':
 			return $elm$html$Html$text('');
 		case 'Loading':
@@ -7497,7 +7500,7 @@ var $author$project$Page$ListRankings$viewPosts = function (posts) {
 						$elm$html$Html$text('Loading...')
 					]));
 		case 'Success':
-			var actualPosts = posts.a;
+			var actualRankings = rankings.a;
 			return A2(
 				$elm$html$Html$div,
 				_List_Nil,
@@ -7508,7 +7511,7 @@ var $author$project$Page$ListRankings$viewPosts = function (posts) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Posts')
+								$elm$html$Html$text('Rankings')
 							])),
 						A2(
 						$elm$html$Html$table,
@@ -7516,10 +7519,10 @@ var $author$project$Page$ListRankings$viewPosts = function (posts) {
 						_Utils_ap(
 							_List_fromArray(
 								[$author$project$Page$ListRankings$viewTableHeader]),
-							A2($elm$core$List$map, $author$project$Page$ListRankings$viewPost, actualPosts)))
+							A2($elm$core$List$map, $author$project$Page$ListRankings$viewRanking, actualRankings)))
 					]));
 		default:
-			var httpError = posts.a;
+			var httpError = rankings.a;
 			return $author$project$Page$ListRankings$viewFetchError(
 				$author$project$Error$buildErrorMessage(httpError));
 	}
@@ -7547,7 +7550,7 @@ var $author$project$Page$ListRankings$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Refresh posts')
+						$elm$html$Html$text('Refresh rankings')
 					])),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
 				A2($elm$html$Html$br, _List_Nil, _List_Nil),
@@ -7559,9 +7562,9 @@ var $author$project$Page$ListRankings$view = function (model) {
 					]),
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Create new post')
+						$elm$html$Html$text('Create new ranking')
 					])),
-				$author$project$Page$ListRankings$viewPosts(model.posts),
+				$author$project$Page$ListRankings$viewRankings(model.rankings),
 				$author$project$Page$ListRankings$viewDeleteError(model.deleteError)
 			]));
 };
@@ -7718,7 +7721,7 @@ var $author$project$Main$view = function (model) {
 			[
 				$author$project$Main$currentView(model)
 			]),
-		title: 'Post App'
+		title: 'SportRank'
 	};
 };
 var $author$project$Main$main = $elm$browser$Browser$application(
