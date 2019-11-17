@@ -149,7 +149,7 @@ viewRanking ranking =
         , td []
             [ a [ href ranking.name ] [ text ranking.name ] ]
         , td []
-            [ a [ href rankingPath ] [ text "View" ] ]
+            [ text ranking.desc ]
         , td []
             --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
             [ text "Delete" ]
