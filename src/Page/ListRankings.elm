@@ -112,7 +112,7 @@ viewRankings rankings =
 
         RemoteData.Success actualRankings ->
             div []
-                [ h3 [] [ text "Rankings" ]
+                [ h3 [] [ text "Select Ranking" ]
                 , table []
                     ([ viewTableHeader ] ++ List.map viewRanking actualRankings)
                 ]
@@ -124,11 +124,11 @@ viewRankings rankings =
 viewTableHeader : Html Msg
 viewTableHeader =
     tr []
-        [ th [ hidden False ]
+        [ th [ hidden True ]
             [ text "ID" ]
-        , th []
+        , th [ hidden True ]
             [ text "Active" ]
-        , th []
+        , th [ hidden False, align "left" ]
             [ text "Ranking" ]
         , th []
             [ text "Description" ]
@@ -142,19 +142,17 @@ viewRanking ranking =
             "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
     in
     tr []
-        [ td [ hidden False ]
+        [ td [ hidden True ]
             [ a [ href rankingPath ] [ text "View" ] ]
-        , td []
+        , td [ hidden True ]
             [ text (boolToString ranking.active) ]
         , td []
-            [ a [ href ranking.name ] [ text ranking.name ] ]
+            [ a [ href rankingPath ] [ text ranking.name ] ]
         , td []
             [ text ranking.desc ]
-        , td []
+        , td [ hidden True ]
             --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
             [ text "Delete" ]
-
-        --]
         ]
 
 

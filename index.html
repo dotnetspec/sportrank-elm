@@ -7471,7 +7471,7 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 				$elm$html$Html$td,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$hidden(false)
+						$elm$html$Html$Attributes$hidden(true)
 					]),
 				_List_fromArray(
 					[
@@ -7488,7 +7488,10 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 					])),
 				A2(
 				$elm$html$Html$td,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$hidden(true)
+					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text(
@@ -7503,7 +7506,7 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 						$elm$html$Html$a,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$href(ranking.name)
+								$elm$html$Html$Attributes$href(rankingPath)
 							]),
 						_List_fromArray(
 							[
@@ -7519,13 +7522,17 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 					])),
 				A2(
 				$elm$html$Html$td,
-				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$hidden(true)
+					]),
 				_List_fromArray(
 					[
 						$elm$html$Html$text('Delete')
 					]))
 			]));
 };
+var $elm$html$Html$Attributes$align = $elm$html$Html$Attributes$stringProperty('align');
 var $elm$html$Html$th = _VirtualDom_node('th');
 var $author$project$Page$ListRankings$viewTableHeader = A2(
 	$elm$html$Html$tr,
@@ -7536,7 +7543,7 @@ var $author$project$Page$ListRankings$viewTableHeader = A2(
 			$elm$html$Html$th,
 			_List_fromArray(
 				[
-					$elm$html$Html$Attributes$hidden(false)
+					$elm$html$Html$Attributes$hidden(true)
 				]),
 			_List_fromArray(
 				[
@@ -7544,14 +7551,21 @@ var $author$project$Page$ListRankings$viewTableHeader = A2(
 				])),
 			A2(
 			$elm$html$Html$th,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$hidden(true)
+				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text('Active')
 				])),
 			A2(
 			$elm$html$Html$th,
-			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$hidden(false),
+					$elm$html$Html$Attributes$align('left')
+				]),
 			_List_fromArray(
 				[
 					$elm$html$Html$text('Ranking')
@@ -7588,7 +7602,7 @@ var $author$project$Page$ListRankings$viewRankings = function (rankings) {
 						_List_Nil,
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Rankings')
+								$elm$html$Html$text('Select Ranking')
 							])),
 						A2(
 						$elm$html$Html$table,
