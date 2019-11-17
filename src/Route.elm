@@ -1,7 +1,7 @@
 module Route exposing (Route(..), parseUrl, pushUrl)
 
 import Browser.Navigation as Nav
-import Ranking exposing (RankingId)
+import Ranking exposing (RankingId(..))
 import Url exposing (Url)
 import Url.Parser exposing (..)
 
@@ -11,6 +11,7 @@ type Route
     | Rankings
     | Ranking RankingId
     | NewRanking
+    | ViewRanking RankingId
 
 
 parseUrl : Url -> Route
@@ -49,8 +50,12 @@ routeToString route =
         Rankings ->
             "/posts"
 
+        -- this is now ViewRanking - delete?
         Ranking postId ->
             "/posts/" ++ "postId"
 
         NewRanking ->
             "/posts/new"
+
+        ViewRanking (RankingId postId) ->
+            "/posts/" ++ postId

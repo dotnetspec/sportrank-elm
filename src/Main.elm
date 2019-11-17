@@ -6,6 +6,7 @@ import Html exposing (..)
 import Page.EditRanking as EditRanking
 import Page.ListRankings as ListRankings
 import Page.NewRanking as NewRanking
+import Page.ViewRanking as ViewRanking
 import Route exposing (Route)
 import Url exposing (Url)
 
@@ -34,6 +35,7 @@ type Page
     | ListPage ListRankings.Model
     | EditPage EditRanking.Model
     | NewPage NewRanking.Model
+    | ViewPage ViewRanking.Model
 
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
@@ -77,6 +79,13 @@ initCurrentPage ( model, existingCmds ) =
                             NewRanking.init model.navKey
                     in
                     ( NewPage pageModel, Cmd.map NewPageMsg pageCmd )
+
+                Route.ViewRanking rankingId ->
+                    let
+                        ( pageModel, pageCmd ) =
+                            ViewRanking.init rankingId model.navKey
+                    in
+                    ( ViewPage pageModel, Cmd.map ViewPageMsg pageCmd )
     in
     --return curently selected page as model and any relevant commands
     ( { model | page = currentPage }
@@ -113,6 +122,10 @@ currentView model =
         NewPage pageModel ->
             NewRanking.view pageModel
                 |> Html.map NewPageMsg
+
+        ViewPage pageModel ->
+            ViewRanking.view pageModel
+                |> Html.map ViewPageMsg
 
 
 notFoundView : Html msg
@@ -170,6 +183,15 @@ update msg model =
             , Cmd.map NewPageMsg updatedCmd
             )
 
+        ( ViewPageMsg subMsg, ViewPage pageModel ) ->
+            let
+                ( updatedPageModel, updatedCmd ) =
+                    ViewRanking.update subMsg pageModel
+            in
+            ( { model | page = ViewPage updatedPageModel }
+            , Cmd.map ViewPageMsg updatedCmd
+            )
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
@@ -180,3 +202,4 @@ type Msg
     | UrlChanged Url
     | EditPageMsg EditRanking.Msg
     | NewPageMsg NewRanking.Msg
+    | ViewPageMsg ViewRanking.Msg

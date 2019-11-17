@@ -139,7 +139,7 @@ viewRanking : Ranking -> Html Msg
 viewRanking ranking =
     let
         rankingPath =
-            "/posts/" ++ ranking.id
+            "https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest" ++ ranking.id ++ "/latest"
     in
     tr []
         [ td [ hidden False ]
@@ -149,7 +149,7 @@ viewRanking ranking =
         , td []
             [ a [ href ranking.name ] [ text ranking.name ] ]
         , td []
-            [ a [ href rankingPath ] [ text "Edit" ] ]
+            [ a [ href rankingPath ] [ text "View" ] ]
         , td []
             --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
             [ text "Delete" ]

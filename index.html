@@ -5330,6 +5330,12 @@ var $author$project$Main$NewPage = function (a) {
 var $author$project$Main$NewPageMsg = function (a) {
 	return {$: 'NewPageMsg', a: a};
 };
+var $author$project$Main$ViewPage = function (a) {
+	return {$: 'ViewPage', a: a};
+};
+var $author$project$Main$ViewPageMsg = function (a) {
+	return {$: 'ViewPageMsg', a: a};
+};
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $author$project$Page$EditRanking$PostReceived = function (a) {
 	return {$: 'PostReceived', a: a};
@@ -6213,6 +6219,29 @@ var $author$project$Page$NewRanking$init = function (navKey) {
 		$author$project$Page$NewRanking$initialModel(navKey),
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Page$ViewRanking$PostReceived = function (a) {
+	return {$: 'PostReceived', a: a};
+};
+var $author$project$Page$ViewRanking$fetchPost = function (_v0) {
+	var postId = _v0.a;
+	return $elm$http$Http$get(
+		{
+			expect: A2(
+				$elm$http$Http$expectJson,
+				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ViewRanking$PostReceived),
+				$author$project$Ranking$rankingDecoder),
+			url: 'https://api.jsonbin.io/b/' + (postId + '/latest')
+		});
+};
+var $author$project$Page$ViewRanking$initialModel = function (navKey) {
+	return {navKey: navKey, post: $krisajenkins$remotedata$RemoteData$Loading, saveError: $elm$core$Maybe$Nothing};
+};
+var $author$project$Page$ViewRanking$init = F2(
+	function (postId, navKey) {
+		return _Utils_Tuple2(
+			$author$project$Page$ViewRanking$initialModel(navKey),
+			$author$project$Page$ViewRanking$fetchPost(postId));
+	});
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Main$initCurrentPage = function (_v0) {
 	var model = _v0.a;
@@ -6237,13 +6266,21 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 				return _Utils_Tuple2(
 					$author$project$Main$EditPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$EditPageMsg, pageCmd));
-			default:
+			case 'NewRanking':
 				var _v5 = $author$project$Page$NewRanking$init(model.navKey);
 				var pageModel = _v5.a;
 				var pageCmd = _v5.b;
 				return _Utils_Tuple2(
 					$author$project$Main$NewPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$NewPageMsg, pageCmd));
+			default:
+				var rankingId = _v2.a;
+				var _v6 = A2($author$project$Page$ViewRanking$init, rankingId, model.navKey);
+				var pageModel = _v6.a;
+				var pageCmd = _v6.b;
+				return _Utils_Tuple2(
+					$author$project$Main$ViewPage(pageModel),
+					A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewPageMsg, pageCmd));
 		}
 	}();
 	var currentPage = _v1.a;
@@ -6610,8 +6647,11 @@ var $author$project$Route$routeToString = function (route) {
 		case 'Ranking':
 			var postId = route.a;
 			return '/posts/' + 'postId';
-		default:
+		case 'NewRanking':
 			return '/posts/new';
+		default:
+			var postId = route.a.a;
+			return '/posts/' + postId;
 	}
 };
 var $author$project$Route$pushUrl = F2(
@@ -6914,10 +6954,113 @@ var $author$project$Page$NewRanking$update = F2(
 				}
 		}
 	});
+var $author$project$Page$ViewRanking$PostSaved = function (a) {
+	return {$: 'PostSaved', a: a};
+};
+var $author$project$Page$ViewRanking$savePost = function (post) {
+	if (post.$ === 'Success') {
+		var postData = post.a;
+		var postUrl = 'http://localhost:5019/posts/' + ('Ranking.idToString' + postData.id);
+		return $elm$http$Http$request(
+			{
+				body: $elm$http$Http$jsonBody(
+					$author$project$Ranking$rankingEncoder(postData)),
+				expect: A2($elm$http$Http$expectJson, $author$project$Page$ViewRanking$PostSaved, $author$project$Ranking$rankingDecoder),
+				headers: _List_Nil,
+				method: 'PATCH',
+				timeout: $elm$core$Maybe$Nothing,
+				tracker: $elm$core$Maybe$Nothing,
+				url: postUrl
+			});
+	} else {
+		return $elm$core$Platform$Cmd$none;
+	}
+};
+var $author$project$Page$ViewRanking$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'PostReceived':
+				var post = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{post: post}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateTitle':
+				var newTitle = msg.a;
+				var updateTitle = A2(
+					$krisajenkins$remotedata$RemoteData$map,
+					function (postData) {
+						return _Utils_update(
+							postData,
+							{active: newTitle});
+					},
+					model.post);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{post: updateTitle}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateAuthorName':
+				var newName = msg.a;
+				var updateAuthorName = A2(
+					$krisajenkins$remotedata$RemoteData$map,
+					function (postData) {
+						return _Utils_update(
+							postData,
+							{name: newName});
+					},
+					model.post);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{post: updateAuthorName}),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdateAuthorUrl':
+				var newUrl = msg.a;
+				var updateAuthorUrl = A2(
+					$krisajenkins$remotedata$RemoteData$map,
+					function (postData) {
+						return _Utils_update(
+							postData,
+							{desc: newUrl});
+					},
+					model.post);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{post: updateAuthorUrl}),
+					$elm$core$Platform$Cmd$none);
+			case 'SavePost':
+				return _Utils_Tuple2(
+					model,
+					$author$project$Page$ViewRanking$savePost(model.post));
+			default:
+				if (msg.a.$ === 'Ok') {
+					var postData = msg.a.a;
+					var post = $krisajenkins$remotedata$RemoteData$succeed(postData);
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{post: post, saveError: $elm$core$Maybe$Nothing}),
+						A2($author$project$Route$pushUrl, $author$project$Route$Rankings, model.navKey));
+				} else {
+					var error = msg.a.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								saveError: $elm$core$Maybe$Just(
+									$author$project$Error$buildErrorMessage(error))
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		var _v0 = _Utils_Tuple2(msg, model.page);
-		_v0$5:
+		_v0$6:
 		while (true) {
 			switch (_v0.a.$) {
 				case 'ListPageMsg':
@@ -6935,7 +7078,7 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$ListPageMsg, updatedCmd));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
@@ -6977,9 +7120,9 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$EditPageMsg, updatedCmd));
 					} else {
-						break _v0$5;
+						break _v0$6;
 					}
-				default:
+				case 'NewPageMsg':
 					if (_v0.b.$ === 'NewPage') {
 						var subMsg = _v0.a.a;
 						var pageModel = _v0.b.a;
@@ -6994,7 +7137,24 @@ var $author$project$Main$update = F2(
 								}),
 							A2($elm$core$Platform$Cmd$map, $author$project$Main$NewPageMsg, updatedCmd));
 					} else {
-						break _v0$5;
+						break _v0$6;
+					}
+				default:
+					if (_v0.b.$ === 'ViewPage') {
+						var subMsg = _v0.a.a;
+						var pageModel = _v0.b.a;
+						var _v5 = A2($author$project$Page$ViewRanking$update, subMsg, pageModel);
+						var updatedPageModel = _v5.a;
+						var updatedCmd = _v5.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									page: $author$project$Main$ViewPage(updatedPageModel)
+								}),
+							A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewPageMsg, updatedCmd));
+					} else {
+						break _v0$6;
 					}
 			}
 		}
@@ -7301,7 +7461,7 @@ var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('h
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Page$ListRankings$viewRanking = function (ranking) {
-	var rankingPath = '/posts/' + ranking.id;
+	var rankingPath = 'https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest' + (ranking.id + '/latest');
 	return A2(
 		$elm$html$Html$tr,
 		_List_Nil,
@@ -7354,7 +7514,7 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Edit')
+								$elm$html$Html$text('View')
 							]))
 					])),
 				A2(
@@ -7607,6 +7767,167 @@ var $author$project$Page$NewRanking$view = function (model) {
 				$author$project$Page$NewRanking$viewError(model.createError)
 			]));
 };
+var $author$project$Page$ViewRanking$SavePost = {$: 'SavePost'};
+var $author$project$Page$ViewRanking$UpdateAuthorName = function (a) {
+	return {$: 'UpdateAuthorName', a: a};
+};
+var $author$project$Page$ViewRanking$UpdateAuthorUrl = function (a) {
+	return {$: 'UpdateAuthorUrl', a: a};
+};
+var $author$project$Page$ViewRanking$editForm = function (post) {
+	return A2(
+		$elm$html$Html$form,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Title'),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$value(post.name)
+							]),
+						_List_Nil)
+					])),
+				A2($elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Author Name'),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$value(post.name),
+								$elm$html$Html$Events$onInput($author$project$Page$ViewRanking$UpdateAuthorName)
+							]),
+						_List_Nil)
+					])),
+				A2($elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Author URL'),
+						A2($elm$html$Html$br, _List_Nil, _List_Nil),
+						A2(
+						$elm$html$Html$input,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('text'),
+								$elm$html$Html$Attributes$value(post.desc),
+								$elm$html$Html$Events$onInput($author$project$Page$ViewRanking$UpdateAuthorUrl)
+							]),
+						_List_Nil)
+					])),
+				A2($elm$html$Html$br, _List_Nil, _List_Nil),
+				A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$button,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$type_('button'),
+								$elm$html$Html$Events$onClick($author$project$Page$ViewRanking$SavePost)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Submit')
+							]))
+					]))
+			]));
+};
+var $author$project$Page$ViewRanking$viewFetchError = function (errorMessage) {
+	var errorHeading = 'Couldn\'t fetch post at this time.';
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(errorHeading)
+					])),
+				$elm$html$Html$text('Error: ' + errorMessage)
+			]));
+};
+var $author$project$Page$ViewRanking$viewPost = function (post) {
+	switch (post.$) {
+		case 'NotAsked':
+			return $elm$html$Html$text('');
+		case 'Loading':
+			return A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Loading Ranking...')
+					]));
+		case 'Success':
+			var postData = post.a;
+			return $author$project$Page$ViewRanking$editForm(postData);
+		default:
+			var httpError = post.a;
+			return $author$project$Page$ViewRanking$viewFetchError(
+				$author$project$Error$buildErrorMessage(httpError));
+	}
+};
+var $author$project$Page$ViewRanking$viewSaveError = function (maybeError) {
+	if (maybeError.$ === 'Just') {
+		var error = maybeError.a;
+		return A2(
+			$elm$html$Html$div,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$h3,
+					_List_Nil,
+					_List_fromArray(
+						[
+							$elm$html$Html$text('Couldn\'t save post at this time.')
+						])),
+					$elm$html$Html$text('Error: ' + error)
+				]));
+	} else {
+		return $elm$html$Html$text('');
+	}
+};
+var $author$project$Page$ViewRanking$view = function (model) {
+	return A2(
+		$elm$html$Html$div,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$h3,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Edit Ranking')
+					])),
+				$author$project$Page$ViewRanking$viewPost(model.post),
+				$author$project$Page$ViewRanking$viewSaveError(model.saveError)
+			]));
+};
 var $author$project$Main$currentView = function (model) {
 	var _v0 = model.page;
 	switch (_v0.$) {
@@ -7624,12 +7945,18 @@ var $author$project$Main$currentView = function (model) {
 				$elm$html$Html$map,
 				$author$project$Main$EditPageMsg,
 				$author$project$Page$EditRanking$view(pageModel));
-		default:
+		case 'NewPage':
 			var pageModel = _v0.a;
 			return A2(
 				$elm$html$Html$map,
 				$author$project$Main$NewPageMsg,
 				$author$project$Page$NewRanking$view(pageModel));
+		default:
+			var pageModel = _v0.a;
+			return A2(
+				$elm$html$Html$map,
+				$author$project$Main$ViewPageMsg,
+				$author$project$Page$ViewRanking$view(pageModel));
 	}
 };
 var $author$project$Main$view = function (model) {

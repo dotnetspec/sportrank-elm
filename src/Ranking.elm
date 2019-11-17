@@ -1,4 +1,4 @@
-module Ranking exposing (Ranking, RankingId, emptyRankingId, newPostEncoder, rankingDecoder, rankingEncoder, rankingsDecoder)
+module Ranking exposing (Ranking, RankingId(..), emptyRankingId, newPostEncoder, rankingDecoder, rankingEncoder, rankingsDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
 import Json.Decode.Pipeline exposing (required)
@@ -16,6 +16,13 @@ type alias Ranking =
 
 type RankingId
     = RankingId String
+
+
+
+-- TODO: make an opaque type?
+-- rankingIdToString: RankingId -> String
+-- rankingIdToString rankingid =
+--   rankingid
 
 
 rankingsDecoder : Decoder (List Ranking)
