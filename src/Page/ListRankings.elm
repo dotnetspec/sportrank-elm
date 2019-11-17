@@ -139,11 +139,11 @@ viewRanking : Ranking -> Html Msg
 viewRanking ranking =
     let
         rankingPath =
-            "https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest" ++ ranking.id ++ "/latest"
+            "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
     in
     tr []
         [ td [ hidden False ]
-            [ text ranking.id ]
+            [ a [ href rankingPath ] [ text "View" ] ]
         , td []
             [ text (boolToString ranking.active) ]
         , td []
