@@ -138,8 +138,10 @@ viewTableHeader =
 viewRanking : Ranking -> Html Msg
 viewRanking ranking =
     let
+        -- rankingPath =
+        --     "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
         rankingPath =
-            "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
+            "/posts/" ++ ranking.id
     in
     tr []
         [ td [ hidden True ]

@@ -33,11 +33,28 @@ initialModel navKey =
 
 fetchPost : RankingId -> Cmd Msg
 fetchPost (RankingId postId) =
-    Http.get
-        { url = "https://api.jsonbin.io/b/" ++ postId ++ "/latest"
+    -- Http.get
+    --     { url = "https://api.jsonbin.io/b/" ++ postId ++ "/latest"
+    --     , expect =
+    --         rankingDecoder
+    --             |> Http.expectJson (RemoteData.fromResult >> PostReceived)
+    --     }
+    let
+        headerKey =
+            Http.header
+                "secret-key"
+                "$2a$10$HIPT9LxAWxYFTW.aaMUoEeIo2N903ebCEbVqB3/HEOwiBsxY3fk2i"
+    in
+    Http.request
+        { body = Http.emptyBody
         , expect =
             rankingDecoder
                 |> Http.expectJson (RemoteData.fromResult >> PostReceived)
+        , headers = [ headerKey ]
+        , method = "GET"
+        , timeout = Nothing
+        , tracker = Nothing
+        , url = "https://api.jsonbin.io/b/" ++ postId ++ "/latest"
         }
 
 
