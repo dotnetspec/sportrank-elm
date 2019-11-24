@@ -6,7 +6,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
-import Ranking exposing (Ranking, RankingId, rankingsDecoder)
+import Ranking exposing (Ranking, RankingId, rankingIdToString, rankingsDecoder)
 import RemoteData exposing (WebData)
 
 
@@ -141,7 +141,7 @@ viewRanking ranking =
         -- rankingPath =
         --     "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
         rankingPath =
-            "/posts/" ++ ranking.id
+            "/" ++ ranking.id
     in
     tr []
         [ td [ hidden True ]

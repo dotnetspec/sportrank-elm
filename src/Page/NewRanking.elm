@@ -126,7 +126,8 @@ update msg model =
 
         PostCreated (Ok post) ->
             ( { model | post = post, createError = Nothing }
-            , Route.pushUrl Route.Rankings model.navKey
+            , --Route.pushUrl Route.Ranking model.navKey
+              Cmd.none
             )
 
         PostCreated (Err error) ->

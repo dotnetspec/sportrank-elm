@@ -1,4 +1,4 @@
-module Ranking exposing (Ranking, RankingId(..), emptyRankingId, newPostEncoder, rankingDecoder, rankingEncoder, rankingsDecoder)
+module Ranking exposing (Ranking, RankingId(..), emptyRankingId, newPostEncoder, rankingDecoder, rankingEncoder, rankingIdToString, rankingsDecoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
 import Json.Decode.Pipeline exposing (required)
@@ -70,3 +70,8 @@ emptyRanking =
 emptyRankingId : RankingId
 emptyRankingId =
     RankingId "-1"
+
+
+rankingIdToString : RankingId -> String
+rankingIdToString (RankingId rankingid) =
+    rankingid

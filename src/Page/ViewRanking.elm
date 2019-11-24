@@ -115,7 +115,8 @@ update msg model =
                     RemoteData.succeed postData
             in
             ( { model | post = post, saveError = Nothing }
-            , Route.pushUrl Route.Rankings model.navKey
+            , --Route.pushUrl Route.ViewRanking model.navKey
+              Cmd.none
             )
 
         PostSaved (Err error) ->

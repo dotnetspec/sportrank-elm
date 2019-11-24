@@ -7,8 +7,10 @@ import Page.EditRanking as EditRanking
 import Page.ListRankings as ListRankings
 import Page.NewRanking as NewRanking
 import Page.ViewRanking as ViewRanking
-import Route exposing (Route)
+import Ranking exposing (..)
+import Route exposing (Route, matchRouteParser)
 import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>))
 
 
 main : Program () Model Msg
@@ -41,6 +43,15 @@ type Page
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     let
+        parsedUrl =
+            Parser.parse matchRouteParser url
+
+        _ =
+            Debug.log "parsedUrl" parsedUrl
+
+        _ =
+            Debug.log "Url" url
+
         model =
             { route = Route.parseUrl url
             , page = NotFoundPage
@@ -52,6 +63,8 @@ init flags url navKey =
 
 initCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 initCurrentPage ( model, existingCmds ) =
+    -- the 'let' at this level will enable the assignment of each of the
+    -- different page models (currentPage) and their assoc commands (mappedPageCmds)
     let
         ( currentPage, mappedPageCmds ) =
             case model.route of
@@ -59,7 +72,9 @@ initCurrentPage ( model, existingCmds ) =
                     ( NotFoundPage, Cmd.none )
 
                 -- This is routing the posts from the other pages
-                Route.Rankings ->
+                Route.ListRankings ->
+                    -- the 'let' at this sub level actually assigns the relevant pageModel
+                    -- the 'in' just returns the (Model, Cmd Msg) as per the annotation
                     let
                         ( pageModel, pageCmds ) =
                             ListRankings.init
@@ -69,11 +84,11 @@ initCurrentPage ( model, existingCmds ) =
                 Route.Ranking rankingId ->
                     let
                         ( pageModel, pageCmd ) =
-                            EditRanking.init rankingId model.navKey
+                            EditRanking.init (RankingId rankingId) model.navKey
                     in
                     ( EditPage pageModel, Cmd.map EditPageMsg pageCmd )
 
-                Route.NewRanking ->
+                Route.NewRanking rankingId ->
                     let
                         ( pageModel, pageCmd ) =
                             NewRanking.init model.navKey
@@ -83,11 +98,12 @@ initCurrentPage ( model, existingCmds ) =
                 Route.ViewRanking rankingId ->
                     let
                         ( pageModel, pageCmd ) =
-                            ViewRanking.init rankingId model.navKey
+                            ViewRanking.init (RankingId rankingId) model.navKey
                     in
                     ( ViewPage pageModel, Cmd.map ViewPageMsg pageCmd )
     in
     --return curently selected page as model and any relevant commands
+    -- as per annotation
     ( { model | page = currentPage }
     , Cmd.batch [ existingCmds, mappedPageCmds ]
     )
@@ -145,6 +161,7 @@ update msg model =
             , Cmd.map ListPageMsg updatedCmd
             )
 
+        --Clicking a link produces a ClickLink message (that will update model) that carries a UrlRequest value.
         ( LinkClicked urlRequest, _ ) ->
             case urlRequest of
                 Browser.Internal url ->
@@ -157,6 +174,8 @@ update msg model =
                     , Nav.load url
                     )
 
+        --When the URL actually changes, update receives a ChangeUrl message with the new URL
+        --We apply Route.parseUrl (which uses matchRouteParser) to that URL and store the route in the model.
         ( UrlChanged url, _ ) ->
             let
                 newRoute =

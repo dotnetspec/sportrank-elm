@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Http
-import Ranking exposing (Ranking, RankingId, rankingDecoder, rankingEncoder)
+import Ranking exposing (Ranking, RankingId, rankingDecoder, rankingEncoder, rankingIdToString)
 import RemoteData exposing (WebData)
 import Route
 
@@ -98,7 +98,8 @@ update msg model =
                     RemoteData.succeed postData
             in
             ( { model | post = post, saveError = Nothing }
-            , Route.pushUrl Route.Rankings model.navKey
+            , --Route.pushUrl Route.Ranking model.navKey
+              Cmd.none
             )
 
         PostSaved (Err error) ->

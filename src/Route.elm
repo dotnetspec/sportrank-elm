@@ -1,22 +1,26 @@
-module Route exposing (Route(..), parseUrl, pushUrl)
+module Route exposing (Route(..), matchRouteParser, parseUrl, pushUrl)
 
 import Browser.Navigation as Nav
-import Ranking exposing (RankingId(..))
+import Ranking exposing (RankingId(..), rankingIdToString)
 import Url exposing (Url)
 import Url.Parser exposing (..)
 
 
 type Route
     = NotFound
-    | Rankings
-    | Ranking RankingId
-    | NewRanking
-    | ViewRanking RankingId
+    | ListRankings
+    | Ranking String
+    | NewRanking String
+    | ViewRanking String
 
 
 parseUrl : Url -> Route
 parseUrl url =
-    case parse matchRoute url of
+    let
+        _ =
+            Debug.log "url in parseUrl " url
+    in
+    case parse matchRouteParser url of
         Just route ->
             route
 
@@ -24,14 +28,25 @@ parseUrl url =
             NotFound
 
 
-matchRoute : Parser (Route -> a) a
-matchRoute =
-    oneOf
-        [ map Rankings top
-        , map Rankings (s "posts")
 
-        --, map Ranking (s "posts" </> "Ranking.idParser")
-        , map NewRanking (s "posts" </> s "new")
+--"5d8f5d00de0ab12e3d91df6e"
+-- tells us if user is on one of the routes
+-- it's a parser that will (hopefully) give us a route
+-- map the routes if we manage to match the url successfully
+-- tell matchRouteParser what the structure of the url will look like
+
+
+matchRouteParser : Parser (Route -> a) a
+matchRouteParser =
+    oneOf
+        [ --map ListRankings (s "/" </> s (rankingIdToString postId))
+          map ListRankings top
+
+        --map ListRankings (s (rankingIdToString RankingId))
+        , map ViewRanking (s "/" </> Url.Parser.string)
+
+        --, map Ranking (s "posts" </> Url.Parser.string)
+        --, map NewRanking (s "posts")
         ]
 
 
@@ -47,15 +62,15 @@ routeToString route =
         NotFound ->
             "/not-found"
 
-        Rankings ->
-            "/posts"
+        ListRankings ->
+            "/"
 
         -- this is now ViewRanking - delete?
         Ranking postId ->
             "/posts/" ++ "postId"
 
-        NewRanking ->
+        NewRanking postId ->
             "/posts/new"
 
-        ViewRanking (RankingId postId) ->
-            "/posts/" ++ postId
+        ViewRanking postId ->
+            "/" ++ postId
