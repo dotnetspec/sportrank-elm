@@ -139,8 +139,43 @@ view model =
         ]
 
 
+
+-- webDataToList : WebData (List Ranking) -> List Ranking
+-- webDataToList rankingid =
+--     {
+--     id = rankinid.id
+--     , active = active
+--     , name = name
+--     , desc = desc
+--     }
+
+
 viewRankings : WebData (List Ranking) -> Html Msg
 viewRankings rankings =
+    -- let
+    --     -- asAList =
+    --     --     webDataToList rankings
+    --     _ =
+    --         Debug.log "viewRankings list" successData
+    -- in
+    --case rankings of
+    -- RemoteData.Success successData ->
+    --     List.map .id
+    --         (Html.text successData)
+    -- RemoteData.Success actualRankings ->
+    --     div []
+    --         [ h3 [] [ text "Select Ranking" ]
+    --         , table []
+    --             ([ viewTableHeader ] ++ List.map .id actualRankings)
+    --         ]
+    -- _ ->
+    --     []
+    -- parsedUrl =
+    --     Parser.parse matchRouteParser url
+    --
+    -- _ =
+    --     Debug.log "parsed url" parsedUrl
+    --in
     case rankings of
         RemoteData.NotAsked ->
             text ""
