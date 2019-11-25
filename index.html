@@ -5312,6 +5312,18 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$NotFoundPage = {$: 'NotFoundPage'};
+var $author$project$Ranking$RankingId = function (a) {
+	return {$: 'RankingId', a: a};
+};
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Main$EditPage = function (a) {
 	return {$: 'EditPage', a: a};
 };
@@ -5329,9 +5341,6 @@ var $author$project$Main$NewPage = function (a) {
 };
 var $author$project$Main$NewPageMsg = function (a) {
 	return {$: 'NewPageMsg', a: a};
-};
-var $author$project$Ranking$RankingId = function (a) {
-	return {$: 'RankingId', a: a};
 };
 var $author$project$Main$ViewPage = function (a) {
 	return {$: 'ViewPage', a: a};
@@ -6210,7 +6219,7 @@ var $author$project$Page$ListRankings$fetchRankings = $elm$http$Http$get(
 			$author$project$Ranking$rankingsDecoder),
 		url: 'https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest'
 	});
-var $author$project$Page$ListRankings$initialModel = {deleteError: $elm$core$Maybe$Nothing, rankings: $krisajenkins$remotedata$RemoteData$Loading};
+var $author$project$Page$ListRankings$initialModel = {deleteError: $elm$core$Maybe$Nothing, ranking: $krisajenkins$remotedata$RemoteData$Loading, rankings: $krisajenkins$remotedata$RemoteData$Loading};
 var $author$project$Page$ListRankings$init = _Utils_Tuple2($author$project$Page$ListRankings$initialModel, $author$project$Page$ListRankings$fetchRankings);
 var $author$project$Page$NewRanking$emptyPost = {active: false, desc: '', id: 'emptyRankingId', name: ''};
 var $author$project$Page$NewRanking$initialModel = function (navKey) {
@@ -6604,14 +6613,30 @@ var $author$project$Route$parseUrl = function (url) {
 };
 var $author$project$Main$init = F3(
 	function (flags, url, navKey) {
+		var parts = A2(
+			$elm$core$Debug$log,
+			'parts',
+			A2($elm$core$String$split, '/', url.path));
+		var rankingid = function () {
+			var _v3 = $elm$core$List$head(
+				$elm$core$List$reverse(parts));
+			if (_v3.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var rnkid = _v3.a;
+				return $elm$core$Maybe$Just(
+					$author$project$Ranking$RankingId(rnkid));
+			}
+		}();
 		var parsedUrl = A2($elm$url$Url$Parser$parse, $author$project$Route$matchRouteParser, url);
 		var model = {
 			navKey: navKey,
 			page: $author$project$Main$NotFoundPage,
 			route: $author$project$Route$parseUrl(url)
 		};
-		var _v0 = A2($elm$core$Debug$log, 'parsedUrl', parsedUrl);
-		var _v1 = A2($elm$core$Debug$log, 'Url', url);
+		var _v0 = A2($elm$core$Debug$log, 'url', url);
+		var _v1 = A2($elm$core$Debug$log, 'parsed url', parsedUrl);
+		var _v2 = A2($elm$core$Debug$log, 'rankingid', rankingid);
 		return $author$project$Main$initCurrentPage(
 			_Utils_Tuple2(model, $elm$core$Platform$Cmd$none));
 	});
@@ -6882,6 +6907,27 @@ var $author$project$Page$ListRankings$update = F2(
 				return _Utils_Tuple2(
 					model,
 					$author$project$Page$ListRankings$deleteRanking(rankingId));
+			case 'RankingDeleted':
+				if (msg.a.$ === 'Ok') {
+					return _Utils_Tuple2(model, $author$project$Page$ListRankings$fetchRankings);
+				} else {
+					var error = msg.a.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								deleteError: $elm$core$Maybe$Just(
+									$author$project$Error$buildErrorMessage(error))
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			case 'ViewRanking':
+				var ranking = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{ranking: $krisajenkins$remotedata$RemoteData$Loading}),
+					$elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 'Ok') {
 					return _Utils_Tuple2(model, $author$project$Page$ListRankings$fetchRankings);
@@ -7479,6 +7525,9 @@ var $author$project$Page$ListRankings$viewFetchError = function (errorMessage) {
 				$elm$html$Html$text('Error: ' + errorMessage)
 			]));
 };
+var $author$project$Page$ListRankings$ViewRanking = function (a) {
+	return {$: 'ViewRanking', a: a};
+};
 var $author$project$Page$ListRankings$boolToString = function (bool) {
 	if (bool) {
 		return 'True';
@@ -7496,7 +7545,7 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('hidden');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Page$ListRankings$viewRanking = function (ranking) {
+var $author$project$Page$ListRankings$viewRankingIdPath = function (ranking) {
 	var rankingPath = '/' + ranking.id;
 	return A2(
 		$elm$html$Html$tr,
@@ -7507,7 +7556,7 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 				$elm$html$Html$td,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$hidden(true)
+						$elm$html$Html$Attributes$hidden(false)
 					]),
 				_List_fromArray(
 					[
@@ -7539,14 +7588,15 @@ var $author$project$Page$ListRankings$viewRanking = function (ranking) {
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$a,
+						$elm$html$Html$button,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$href(rankingPath)
+								$elm$html$Html$Events$onClick(
+								$author$project$Page$ListRankings$ViewRanking(ranking))
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(ranking.name)
+								$elm$html$Html$text('Select')
 							]))
 					])),
 				A2(
@@ -7628,6 +7678,13 @@ var $author$project$Page$ListRankings$viewRankings = function (rankings) {
 					]));
 		case 'Success':
 			var actualRankings = rankings.a;
+			var temp = A2(
+				$elm$core$List$map,
+				function ($) {
+					return $.id;
+				},
+				actualRankings);
+			var _v1 = A2($elm$core$Debug$log, 'actualRankings', temp);
 			return A2(
 				$elm$html$Html$div,
 				_List_Nil,
@@ -7646,7 +7703,7 @@ var $author$project$Page$ListRankings$viewRankings = function (rankings) {
 						_Utils_ap(
 							_List_fromArray(
 								[$author$project$Page$ListRankings$viewTableHeader]),
-							A2($elm$core$List$map, $author$project$Page$ListRankings$viewRanking, actualRankings)))
+							A2($elm$core$List$map, $author$project$Page$ListRankings$viewRankingIdPath, actualRankings)))
 					]));
 		default:
 			var httpError = rankings.a;

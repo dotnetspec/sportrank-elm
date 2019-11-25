@@ -43,14 +43,30 @@ type Page
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     let
+        _ =
+            Debug.log "url" url
+
         parsedUrl =
             Parser.parse matchRouteParser url
 
         _ =
-            Debug.log "parsedUrl" parsedUrl
+            Debug.log "parsed url" parsedUrl
+
+        parts =
+            Debug.log "parts" (String.split "/" url.path)
+
+        rankingid =
+            case
+                List.reverse parts |> List.head
+            of
+                Nothing ->
+                    Nothing
+
+                Just rnkid ->
+                    Just (RankingId rnkid)
 
         _ =
-            Debug.log "Url" url
+            Debug.log "rankingid" rankingid
 
         model =
             { route = Route.parseUrl url

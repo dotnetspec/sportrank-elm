@@ -6,12 +6,16 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as Decode
-import Ranking exposing (Ranking, RankingId, rankingIdToString, rankingsDecoder)
+import Ranking exposing (Ranking, RankingId(..), rankingIdToString, rankingsDecoder)
 import RemoteData exposing (WebData)
+import Route exposing (Route, matchRouteParser)
+import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>))
 
 
 type alias Model =
     { rankings : WebData (List Ranking)
+    , ranking : WebData Ranking
     , deleteError : Maybe String
     }
 
@@ -21,6 +25,8 @@ type Msg
     | RankingsReceived (WebData (List Ranking))
     | DeleteRanking RankingId
     | RankingDeleted (Result Http.Error String)
+    | ViewRanking Ranking
+    | ViewRankingResult (Result Http.Error String)
 
 
 init : ( Model, Cmd Msg )
@@ -31,6 +37,7 @@ init =
 initialModel : Model
 initialModel =
     { rankings = RemoteData.Loading
+    , ranking = RemoteData.Loading
     , deleteError = Nothing
     }
 
@@ -65,6 +72,20 @@ update msg model =
             , Cmd.none
             )
 
+        ViewRanking ranking ->
+            --( model, viewRankingIdPath ranking )
+            ( { model | ranking = RemoteData.Loading }, Cmd.none )
+
+        --TODO: change these two to viewRanking results not fetchRankings (that was used to get it to work)
+        ViewRankingResult (Ok _) ->
+            --( model, viewRanking (RankingId rankingId) )
+            ( model, fetchRankings )
+
+        ViewRankingResult (Err error) ->
+            ( { model | deleteError = Just (buildErrorMessage error) }
+            , Cmd.none
+            )
+
 
 deleteRanking : RankingId -> Cmd Msg
 deleteRanking rankingId =
@@ -74,6 +95,23 @@ deleteRanking rankingId =
         , url = "http://localhost:5019/posts/" ++ "rankingId.id"
         , body = Http.emptyBody
         , expect = Http.expectString RankingDeleted
+        , timeout = Nothing
+        , tracker = Nothing
+        }
+
+
+viewRanking : RankingId -> Cmd Msg
+viewRanking rankingId =
+    let
+        rnkid =
+            rankingIdToString rankingId
+    in
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = "https://api.jsonbin.io/b/" ++ rnkid ++ "/latest"
+        , body = Http.emptyBody
+        , expect = Http.expectString ViewRankingResult
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -111,10 +149,17 @@ viewRankings rankings =
             h3 [] [ text "Loading..." ]
 
         RemoteData.Success actualRankings ->
+            let
+                temp =
+                    List.map .id actualRankings
+
+                _ =
+                    Debug.log "actualRankings" temp
+            in
             div []
                 [ h3 [] [ text "Select Ranking" ]
                 , table []
-                    ([ viewTableHeader ] ++ List.map viewRanking actualRankings)
+                    ([ viewTableHeader ] ++ List.map viewRankingIdPath actualRankings)
                 ]
 
         RemoteData.Failure httpError ->
@@ -135,8 +180,8 @@ viewTableHeader =
         ]
 
 
-viewRanking : Ranking -> Html Msg
-viewRanking ranking =
+viewRankingIdPath : Ranking -> Html Msg
+viewRankingIdPath ranking =
     let
         -- rankingPath =
         --     "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
@@ -144,12 +189,14 @@ viewRanking ranking =
             "/" ++ ranking.id
     in
     tr []
-        [ td [ hidden True ]
+        [ td [ hidden False ]
             [ a [ href rankingPath ] [ text "View" ] ]
         , td [ hidden True ]
             [ text (boolToString ranking.active) ]
         , td []
-            [ a [ href rankingPath ] [ text ranking.name ] ]
+            --[ a [ href rankingPath ] [ text ranking.name ] ]
+            --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
+            [ button [ onClick (ViewRanking ranking) ] [ text "Select" ] ]
         , td []
             [ text ranking.desc ]
         , td [ hidden True ]
