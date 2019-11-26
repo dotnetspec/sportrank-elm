@@ -5312,24 +5312,6 @@ var $elm$core$Task$perform = F2(
 	});
 var $elm$browser$Browser$application = _Browser_application;
 var $author$project$Main$NotFoundPage = {$: 'NotFoundPage'};
-var $author$project$Ranking$RankingId = function (a) {
-	return {$: 'RankingId', a: a};
-};
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $author$project$Main$EditPage = function (a) {
-	return {$: 'EditPage', a: a};
-};
-var $author$project$Main$EditPageMsg = function (a) {
-	return {$: 'EditPageMsg', a: a};
-};
 var $author$project$Main$ListPage = function (a) {
 	return {$: 'ListPage', a: a};
 };
@@ -5342,6 +5324,9 @@ var $author$project$Main$NewPage = function (a) {
 var $author$project$Main$NewPageMsg = function (a) {
 	return {$: 'NewPageMsg', a: a};
 };
+var $author$project$Ranking$RankingId = function (a) {
+	return {$: 'RankingId', a: a};
+};
 var $author$project$Main$ViewPage = function (a) {
 	return {$: 'ViewPage', a: a};
 };
@@ -5349,8 +5334,8 @@ var $author$project$Main$ViewPageMsg = function (a) {
 	return {$: 'ViewPageMsg', a: a};
 };
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $author$project$Page$EditRanking$PostReceived = function (a) {
-	return {$: 'PostReceived', a: a};
+var $author$project$Page$ListRankings$RankingsReceived = function (a) {
+	return {$: 'RankingsReceived', a: a};
 };
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
@@ -6154,6 +6139,7 @@ var $elm$http$Http$get = function (r) {
 	return $elm$http$Http$request(
 		{body: $elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: $elm$core$Maybe$Nothing, tracker: $elm$core$Maybe$Nothing, url: r.url});
 };
+var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Ranking$Ranking = F4(
 	function (id, active, name, desc) {
 		return {active: active, desc: desc, id: id, name: name};
@@ -6186,30 +6172,6 @@ var $author$project$Ranking$rankingDecoder = A3(
 				'RANKINGID',
 				$elm$json$Json$Decode$string,
 				$elm$json$Json$Decode$succeed($author$project$Ranking$Ranking)))));
-var $author$project$Page$EditRanking$fetchPost = function (postId) {
-	return $elm$http$Http$get(
-		{
-			expect: A2(
-				$elm$http$Http$expectJson,
-				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$EditRanking$PostReceived),
-				$author$project$Ranking$rankingDecoder),
-			url: 'http://localhost:5019/posts/' + ('Ranking.idToString' + 'postId')
-		});
-};
-var $krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
-var $author$project$Page$EditRanking$initialModel = function (navKey) {
-	return {navKey: navKey, post: $krisajenkins$remotedata$RemoteData$Loading, saveError: $elm$core$Maybe$Nothing};
-};
-var $author$project$Page$EditRanking$init = F2(
-	function (postId, navKey) {
-		return _Utils_Tuple2(
-			$author$project$Page$EditRanking$initialModel(navKey),
-			$author$project$Page$EditRanking$fetchPost(postId));
-	});
-var $author$project$Page$ListRankings$RankingsReceived = function (a) {
-	return {$: 'RankingsReceived', a: a};
-};
-var $elm$json$Json$Decode$list = _Json_decodeList;
 var $author$project$Ranking$rankingsDecoder = $elm$json$Json$Decode$list($author$project$Ranking$rankingDecoder);
 var $author$project$Page$ListRankings$fetchRankings = $elm$http$Http$get(
 	{
@@ -6219,7 +6181,12 @@ var $author$project$Page$ListRankings$fetchRankings = $elm$http$Http$get(
 			$author$project$Ranking$rankingsDecoder),
 		url: 'https://api.jsonbin.io/b/5c36f5422c87fa27306acb52/latest'
 	});
-var $author$project$Page$ListRankings$initialModel = {deleteError: $elm$core$Maybe$Nothing, ranking: $krisajenkins$remotedata$RemoteData$Loading, rankings: $krisajenkins$remotedata$RemoteData$Loading};
+var $krisajenkins$remotedata$RemoteData$Loading = {$: 'Loading'};
+var $author$project$Page$ListRankings$initialModel = {
+	deleteError: $elm$core$Maybe$Nothing,
+	ranking: {active: true, desc: 'Initial', id: '', name: 'Initial'},
+	rankings: $krisajenkins$remotedata$RemoteData$Loading
+};
 var $author$project$Page$ListRankings$init = _Utils_Tuple2($author$project$Page$ListRankings$initialModel, $author$project$Page$ListRankings$fetchRankings);
 var $author$project$Page$NewRanking$emptyPost = {active: false, desc: '', id: 'emptyRankingId', name: ''};
 var $author$project$Page$NewRanking$initialModel = function (navKey) {
@@ -6239,9 +6206,11 @@ var $elm$http$Http$Header = F2(
 		return {$: 'Header', a: a, b: b};
 	});
 var $elm$http$Http$header = $elm$http$Http$Header;
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Page$ViewRanking$fetchPost = function (_v0) {
 	var postId = _v0.a;
 	var headerKey = A2($elm$http$Http$header, 'secret-key', '$2a$10$HIPT9LxAWxYFTW.aaMUoEeIo2N903ebCEbVqB3/HEOwiBsxY3fk2i');
+	var _v1 = A2($elm$core$Debug$log, 'rankingid in fetchPost', postId);
 	return $elm$http$Http$request(
 		{
 			body: $elm$http$Http$emptyBody,
@@ -6258,10 +6227,11 @@ var $author$project$Page$ViewRanking$fetchPost = function (_v0) {
 		});
 };
 var $author$project$Page$ViewRanking$initialModel = function (navKey) {
-	return {navKey: navKey, post: $krisajenkins$remotedata$RemoteData$Loading, saveError: $elm$core$Maybe$Nothing};
+	return {navKey: navKey, ranking: $krisajenkins$remotedata$RemoteData$Loading, saveError: $elm$core$Maybe$Nothing};
 };
 var $author$project$Page$ViewRanking$init = F2(
 	function (postId, navKey) {
+		var _v0 = $elm$core$Debug$log('made it to viewRanking');
 		return _Utils_Tuple2(
 			$author$project$Page$ViewRanking$initialModel(navKey),
 			$author$project$Page$ViewRanking$fetchPost(postId));
@@ -6270,52 +6240,43 @@ var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Main$initCurrentPage = function (_v0) {
 	var model = _v0.a;
 	var existingCmds = _v0.b;
-	var _v1 = function () {
-		var _v2 = model.route;
-		switch (_v2.$) {
+	var _v1 = $elm$core$Debug$log('in initCurrentPage');
+	var _v2 = A2($elm$core$Debug$log, 'current route', model.route);
+	var _v3 = function () {
+		var _v4 = model.route;
+		switch (_v4.$) {
 			case 'NotFound':
 				return _Utils_Tuple2($author$project$Main$NotFoundPage, $elm$core$Platform$Cmd$none);
 			case 'ListRankings':
-				var _v3 = $author$project$Page$ListRankings$init;
-				var pageModel = _v3.a;
-				var pageCmds = _v3.b;
+				var _v5 = $author$project$Page$ListRankings$init;
+				var pageModel = _v5.a;
+				var pageCmds = _v5.b;
 				return _Utils_Tuple2(
 					$author$project$Main$ListPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$ListPageMsg, pageCmds));
-			case 'Ranking':
-				var rankingId = _v2.a;
-				var _v4 = A2(
-					$author$project$Page$EditRanking$init,
-					$author$project$Ranking$RankingId(rankingId),
-					model.navKey);
-				var pageModel = _v4.a;
-				var pageCmd = _v4.b;
-				return _Utils_Tuple2(
-					$author$project$Main$EditPage(pageModel),
-					A2($elm$core$Platform$Cmd$map, $author$project$Main$EditPageMsg, pageCmd));
 			case 'NewRanking':
-				var rankingId = _v2.a;
-				var _v5 = $author$project$Page$NewRanking$init(model.navKey);
-				var pageModel = _v5.a;
-				var pageCmd = _v5.b;
+				var rankingId = _v4.a;
+				var _v6 = $author$project$Page$NewRanking$init(model.navKey);
+				var pageModel = _v6.a;
+				var pageCmd = _v6.b;
 				return _Utils_Tuple2(
 					$author$project$Main$NewPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$NewPageMsg, pageCmd));
 			default:
-				var rankingId = _v2.a;
-				var _v6 = A2(
+				var rankingId = _v4.a;
+				var _v7 = A2(
 					$author$project$Page$ViewRanking$init,
 					$author$project$Ranking$RankingId(rankingId),
 					model.navKey);
-				var pageModel = _v6.a;
-				var pageCmd = _v6.b;
+				var pageModel = _v7.a;
+				var pageCmd = _v7.b;
 				return _Utils_Tuple2(
 					$author$project$Main$ViewPage(pageModel),
 					A2($elm$core$Platform$Cmd$map, $author$project$Main$ViewPageMsg, pageCmd));
 		}
 	}();
-	var currentPage = _v1.a;
-	var mappedPageCmds = _v1.b;
+	var currentPage = _v3.a;
+	var mappedPageCmds = _v3.b;
 	return _Utils_Tuple2(
 		_Utils_update(
 			model,
@@ -6324,7 +6285,7 @@ var $author$project$Main$initCurrentPage = function (_v0) {
 			_List_fromArray(
 				[existingCmds, mappedPageCmds])));
 };
-var $elm$core$Debug$log = _Debug_log;
+var $author$project$Route$NotFound = {$: 'NotFound'};
 var $author$project$Route$ListRankings = {$: 'ListRankings'};
 var $author$project$Route$ViewRanking = function (a) {
 	return {$: 'ViewRanking', a: a};
@@ -6473,18 +6434,22 @@ var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
 		return _List_fromArray(
 			[state]);
 	});
-var $author$project$Route$matchRouteParser = $elm$url$Url$Parser$oneOf(
-	_List_fromArray(
-		[
-			A2($elm$url$Url$Parser$map, $author$project$Route$ListRankings, $elm$url$Url$Parser$top),
-			A2(
-			$elm$url$Url$Parser$map,
-			$author$project$Route$ViewRanking,
-			A2(
-				$elm$url$Url$Parser$slash,
-				$elm$url$Url$Parser$s('/'),
-				$elm$url$Url$Parser$string))
-		]));
+var $author$project$Route$matchRouteParser = function () {
+	var _v0 = A2($elm$core$Debug$log, 'in matchRouteParser', $author$project$Route$ViewRanking);
+	var _v1 = A2($elm$core$Debug$log, 'ViewRanking', $author$project$Route$ViewRanking);
+	return $elm$url$Url$Parser$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$url$Url$Parser$map, $author$project$Route$ListRankings, $elm$url$Url$Parser$top),
+				A2(
+				$elm$url$Url$Parser$map,
+				$author$project$Route$ViewRanking,
+				A2(
+					$elm$url$Url$Parser$slash,
+					$elm$url$Url$Parser$s('Page'),
+					$elm$url$Url$Parser$string))
+			]));
+}();
 var $elm$url$Url$Parser$getFirstMatch = function (states) {
 	getFirstMatch:
 	while (true) {
@@ -6600,12 +6565,12 @@ var $elm$url$Url$Parser$parse = F2(
 					url.fragment,
 					$elm$core$Basics$identity)));
 	});
-var $author$project$Route$NotFound = {$: 'NotFound'};
 var $author$project$Route$parseUrl = function (url) {
 	var _v0 = A2($elm$core$Debug$log, 'url in parseUrl ', url);
 	var _v1 = A2($elm$url$Url$Parser$parse, $author$project$Route$matchRouteParser, url);
 	if (_v1.$ === 'Just') {
 		var route = _v1.a;
+		var _v2 = A2($elm$core$Debug$log, 'route', route);
 		return route;
 	} else {
 		return $author$project$Route$NotFound;
@@ -6613,35 +6578,24 @@ var $author$project$Route$parseUrl = function (url) {
 };
 var $author$project$Main$init = F3(
 	function (flags, url, navKey) {
-		var parts = A2(
-			$elm$core$Debug$log,
-			'parts',
-			A2($elm$core$String$split, '/', url.path));
-		var rankingid = function () {
-			var _v3 = $elm$core$List$head(
-				$elm$core$List$reverse(parts));
-			if (_v3.$ === 'Nothing') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var rnkid = _v3.a;
-				return $elm$core$Maybe$Just(
-					$author$project$Ranking$RankingId(rnkid));
-			}
-		}();
-		var parsedUrl = A2($elm$url$Url$Parser$parse, $author$project$Route$matchRouteParser, url);
 		var model = {
 			navKey: navKey,
 			page: $author$project$Main$NotFoundPage,
 			route: $author$project$Route$parseUrl(url)
 		};
 		var _v0 = A2($elm$core$Debug$log, 'url', url);
-		var _v1 = A2($elm$core$Debug$log, 'parsed url', parsedUrl);
-		var _v2 = A2($elm$core$Debug$log, 'rankingid', rankingid);
+		var _v1 = A3($elm$core$Debug$log, 'Route.parseUrl url', $author$project$Route$parseUrl, url);
 		return $author$project$Main$initCurrentPage(
 			_Utils_Tuple2(model, $elm$core$Platform$Cmd$none));
 	});
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
+var $author$project$Main$EditPage = function (a) {
+	return {$: 'EditPage', a: a};
+};
+var $author$project$Main$EditPageMsg = function (a) {
+	return {$: 'EditPageMsg', a: a};
+};
 var $elm$browser$Browser$Navigation$load = _Browser_load;
 var $elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
 var $elm$url$Url$addPort = F2(
@@ -6923,10 +6877,11 @@ var $author$project$Page$ListRankings$update = F2(
 				}
 			case 'ViewRanking':
 				var ranking = msg.a;
+				var _v1 = A2($elm$core$Debug$log, 'in viewRanking, id', ranking.id);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{ranking: $krisajenkins$remotedata$RemoteData$Loading}),
+						{ranking: ranking}),
 					$elm$core$Platform$Cmd$none);
 			default:
 				if (msg.a.$ === 'Ok') {
@@ -7066,7 +7021,7 @@ var $author$project$Page$ViewRanking$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{post: post}),
+						{ranking: post}),
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateTitle':
 				var newTitle = msg.a;
@@ -7077,11 +7032,11 @@ var $author$project$Page$ViewRanking$update = F2(
 							postData,
 							{active: newTitle});
 					},
-					model.post);
+					model.ranking);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{post: updateTitle}),
+						{ranking: updateTitle}),
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateAuthorName':
 				var newName = msg.a;
@@ -7092,11 +7047,11 @@ var $author$project$Page$ViewRanking$update = F2(
 							postData,
 							{name: newName});
 					},
-					model.post);
+					model.ranking);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{post: updateAuthorName}),
+						{ranking: updateAuthorName}),
 					$elm$core$Platform$Cmd$none);
 			case 'UpdateAuthorUrl':
 				var newUrl = msg.a;
@@ -7107,16 +7062,16 @@ var $author$project$Page$ViewRanking$update = F2(
 							postData,
 							{desc: newUrl});
 					},
-					model.post);
+					model.ranking);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{post: updateAuthorUrl}),
+						{ranking: updateAuthorUrl}),
 					$elm$core$Platform$Cmd$none);
 			case 'SavePost':
 				return _Utils_Tuple2(
 					model,
-					$author$project$Page$ViewRanking$savePost(model.post));
+					$author$project$Page$ViewRanking$savePost(model.ranking));
 			default:
 				if (msg.a.$ === 'Ok') {
 					var postData = msg.a.a;
@@ -7124,7 +7079,7 @@ var $author$project$Page$ViewRanking$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{post: post, saveError: $elm$core$Maybe$Nothing}),
+							{ranking: post, saveError: $elm$core$Maybe$Nothing}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					var error = msg.a.a;
@@ -7228,6 +7183,7 @@ var $author$project$Main$update = F2(
 						var _v5 = A2($author$project$Page$ViewRanking$update, subMsg, pageModel);
 						var updatedPageModel = _v5.a;
 						var updatedCmd = _v5.b;
+						var _v6 = $elm$core$Debug$log('in ViewPageMsg');
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7545,32 +7501,12 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('hidden');
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
-var $author$project$Page$ListRankings$viewRankingIdPath = function (ranking) {
-	var rankingPath = '/' + ranking.id;
+var $author$project$Page$ListRankings$viewTableBody = function (ranking) {
 	return A2(
 		$elm$html$Html$tr,
 		_List_Nil,
 		_List_fromArray(
 			[
-				A2(
-				$elm$html$Html$td,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$hidden(false)
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$a,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$href(rankingPath)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('View')
-							]))
-					])),
 				A2(
 				$elm$html$Html$td,
 				_List_fromArray(
@@ -7678,13 +7614,6 @@ var $author$project$Page$ListRankings$viewRankings = function (rankings) {
 					]));
 		case 'Success':
 			var actualRankings = rankings.a;
-			var temp = A2(
-				$elm$core$List$map,
-				function ($) {
-					return $.id;
-				},
-				actualRankings);
-			var _v1 = A2($elm$core$Debug$log, 'actualRankings', temp);
 			return A2(
 				$elm$html$Html$div,
 				_List_Nil,
@@ -7703,7 +7632,7 @@ var $author$project$Page$ListRankings$viewRankings = function (rankings) {
 						_Utils_ap(
 							_List_fromArray(
 								[$author$project$Page$ListRankings$viewTableHeader]),
-							A2($elm$core$List$map, $author$project$Page$ListRankings$viewRankingIdPath, actualRankings)))
+							A2($elm$core$List$map, $author$project$Page$ListRankings$viewTableBody, actualRankings)))
 					]));
 		default:
 			var httpError = rankings.a;
@@ -7976,7 +7905,7 @@ var $author$project$Page$ViewRanking$viewFetchError = function (errorMessage) {
 				$elm$html$Html$text('Error: ' + errorMessage)
 			]));
 };
-var $author$project$Page$ViewRanking$viewPost = function (post) {
+var $author$project$Page$ViewRanking$viewRanking = function (post) {
 	switch (post.$) {
 		case 'NotAsked':
 			return $elm$html$Html$text('');
@@ -8031,7 +7960,7 @@ var $author$project$Page$ViewRanking$view = function (model) {
 					[
 						$elm$html$Html$text('Edit Ranking')
 					])),
-				$author$project$Page$ViewRanking$viewPost(model.post),
+				$author$project$Page$ViewRanking$viewRanking(model.ranking),
 				$author$project$Page$ViewRanking$viewSaveError(model.saveError)
 			]));
 };

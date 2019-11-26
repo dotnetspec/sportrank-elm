@@ -46,27 +46,31 @@ init flags url navKey =
         _ =
             Debug.log "url" url
 
-        parsedUrl =
-            Parser.parse matchRouteParser url
-
+        --
+        -- parsedUrl =
+        --     Parser.parse matchRouteParser url
+        --
+        -- _ =
+        --     Debug.log "parsed url" parsedUrl
+        --
+        -- parts =
+        --     Debug.log "parts" (String.split "/" url.path)
+        --
+        -- rankingid =
+        --     case
+        --         List.reverse parts |> List.head
+        --     of
+        --         Nothing ->
+        --             Nothing
+        --
+        --         Just rnkid ->
+        --             Just (RankingId rnkid)
+        --
+        -- _ =
+        --     Debug.log "rankingid" rankingid
+        --
         _ =
-            Debug.log "parsed url" parsedUrl
-
-        parts =
-            Debug.log "parts" (String.split "/" url.path)
-
-        rankingid =
-            case
-                List.reverse parts |> List.head
-            of
-                Nothing ->
-                    Nothing
-
-                Just rnkid ->
-                    Just (RankingId rnkid)
-
-        _ =
-            Debug.log "rankingid" rankingid
+            Debug.log "Route.parseUrl url" Route.parseUrl url
 
         model =
             { route = Route.parseUrl url
@@ -77,8 +81,20 @@ init flags url navKey =
     initCurrentPage ( model, Cmd.none )
 
 
+
+--initCurrentPage takes the main model and any commands we may want to fire when the app is being initialized.
+-- It then looks at the current route and determines which page to initialize
+
+
 initCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 initCurrentPage ( model, existingCmds ) =
+    let
+        _ =
+            Debug.log "in initCurrentPage"
+
+        _ =
+            Debug.log "current route" model.route
+    in
     -- the 'let' at this level will enable the assignment of each of the
     -- different page models (currentPage) and their assoc commands (mappedPageCmds)
     let
@@ -97,13 +113,12 @@ initCurrentPage ( model, existingCmds ) =
                     in
                     ( ListPage pageModel, Cmd.map ListPageMsg pageCmds )
 
-                Route.Ranking rankingId ->
-                    let
-                        ( pageModel, pageCmd ) =
-                            EditRanking.init (RankingId rankingId) model.navKey
-                    in
-                    ( EditPage pageModel, Cmd.map EditPageMsg pageCmd )
-
+                -- Route.Ranking rankingId ->
+                --     let
+                --         ( pageModel, pageCmd ) =
+                --             EditRanking.init (RankingId rankingId) model.navKey
+                --     in
+                --     ( EditPage pageModel, Cmd.map EditPageMsg pageCmd )
                 Route.NewRanking rankingId ->
                     let
                         ( pageModel, pageCmd ) =
@@ -220,6 +235,9 @@ update msg model =
 
         ( ViewPageMsg subMsg, ViewPage pageModel ) ->
             let
+                _ =
+                    Debug.log "in ViewPageMsg"
+
                 ( updatedPageModel, updatedCmd ) =
                     ViewRanking.update subMsg pageModel
             in

@@ -13,20 +13,24 @@ import Route
 
 type alias Model =
     { navKey : Nav.Key
-    , post : WebData Ranking
+    , ranking : WebData Ranking
     , saveError : Maybe String
     }
 
 
 init : RankingId -> Nav.Key -> ( Model, Cmd Msg )
 init postId navKey =
+    let
+        _ =
+            Debug.log "made it to viewRanking"
+    in
     ( initialModel navKey, fetchPost postId )
 
 
 initialModel : Nav.Key -> Model
 initialModel navKey =
     { navKey = navKey
-    , post = RemoteData.Loading
+    , ranking = RemoteData.Loading
     , saveError = Nothing
     }
 
@@ -40,6 +44,9 @@ fetchPost (RankingId postId) =
     --             |> Http.expectJson (RemoteData.fromResult >> PostReceived)
     --     }
     let
+        _ =
+            Debug.log "rankingid in fetchPost" postId
+
         headerKey =
             Http.header
                 "secret-key"
@@ -71,7 +78,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         PostReceived post ->
-            ( { model | post = post }, Cmd.none )
+            ( { model | ranking = post }, Cmd.none )
 
         UpdateTitle newTitle ->
             let
@@ -80,9 +87,9 @@ update msg model =
                         (\postData ->
                             { postData | active = newTitle }
                         )
-                        model.post
+                        model.ranking
             in
-            ( { model | post = updateTitle }, Cmd.none )
+            ( { model | ranking = updateTitle }, Cmd.none )
 
         UpdateAuthorName newName ->
             let
@@ -91,9 +98,9 @@ update msg model =
                         (\postData ->
                             { postData | name = newName }
                         )
-                        model.post
+                        model.ranking
             in
-            ( { model | post = updateAuthorName }, Cmd.none )
+            ( { model | ranking = updateAuthorName }, Cmd.none )
 
         UpdateAuthorUrl newUrl ->
             let
@@ -102,19 +109,19 @@ update msg model =
                         (\postData ->
                             { postData | desc = newUrl }
                         )
-                        model.post
+                        model.ranking
             in
-            ( { model | post = updateAuthorUrl }, Cmd.none )
+            ( { model | ranking = updateAuthorUrl }, Cmd.none )
 
         SavePost ->
-            ( model, savePost model.post )
+            ( model, savePost model.ranking )
 
         PostSaved (Ok postData) ->
             let
                 post =
                     RemoteData.succeed postData
             in
-            ( { model | post = post, saveError = Nothing }
+            ( { model | ranking = post, saveError = Nothing }
             , --Route.pushUrl Route.ViewRanking model.navKey
               Cmd.none
             )
@@ -153,13 +160,13 @@ view : Model -> Html Msg
 view model =
     div []
         [ h3 [] [ text "Edit Ranking" ]
-        , viewPost model.post
+        , viewRanking model.ranking
         , viewSaveError model.saveError
         ]
 
 
-viewPost : WebData Ranking -> Html Msg
-viewPost post =
+viewRanking : WebData Ranking -> Html Msg
+viewRanking post =
     case post of
         RemoteData.NotAsked ->
             text ""

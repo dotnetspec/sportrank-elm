@@ -15,9 +15,13 @@ import Url.Parser as Parser exposing ((</>))
 
 type alias Model =
     { rankings : WebData (List Ranking)
-    , ranking : WebData Ranking
+    , ranking : Ranking
     , deleteError : Maybe String
     }
+
+
+
+-- these Msg types get sent to update e.g. onClick
 
 
 type Msg
@@ -34,10 +38,19 @@ init =
     ( initialModel, fetchRankings )
 
 
+
+-- set initial model values here
+
+
 initialModel : Model
 initialModel =
     { rankings = RemoteData.Loading
-    , ranking = RemoteData.Loading
+    , ranking =
+        { id = ""
+        , active = True
+        , name = "Initial"
+        , desc = "Initial"
+        }
     , deleteError = Nothing
     }
 
@@ -73,12 +86,14 @@ update msg model =
             )
 
         ViewRanking ranking ->
-            --( model, viewRankingIdPath ranking )
-            ( { model | ranking = RemoteData.Loading }, Cmd.none )
+            let
+                _ =
+                    Debug.log "in viewRanking, id" ranking.id
+            in
+            ( { model | ranking = ranking }, Cmd.none )
 
-        --TODO: change these two to viewRanking results not fetchRankings (that was used to get it to work)
+        --REVIEW: change these two to viewRanking results not fetchRankings (that was used to get it to work)?
         ViewRankingResult (Ok _) ->
-            --( model, viewRanking (RankingId rankingId) )
             ( model, fetchRankings )
 
         ViewRankingResult (Err error) ->
@@ -95,23 +110,6 @@ deleteRanking rankingId =
         , url = "http://localhost:5019/posts/" ++ "rankingId.id"
         , body = Http.emptyBody
         , expect = Http.expectString RankingDeleted
-        , timeout = Nothing
-        , tracker = Nothing
-        }
-
-
-viewRanking : RankingId -> Cmd Msg
-viewRanking rankingId =
-    let
-        rnkid =
-            rankingIdToString rankingId
-    in
-    Http.request
-        { method = "GET"
-        , headers = []
-        , url = "https://api.jsonbin.io/b/" ++ rnkid ++ "/latest"
-        , body = Http.emptyBody
-        , expect = Http.expectString ViewRankingResult
         , timeout = Nothing
         , tracker = Nothing
         }
@@ -139,43 +137,8 @@ view model =
         ]
 
 
-
--- webDataToList : WebData (List Ranking) -> List Ranking
--- webDataToList rankingid =
---     {
---     id = rankinid.id
---     , active = active
---     , name = name
---     , desc = desc
---     }
-
-
 viewRankings : WebData (List Ranking) -> Html Msg
 viewRankings rankings =
-    -- let
-    --     -- asAList =
-    --     --     webDataToList rankings
-    --     _ =
-    --         Debug.log "viewRankings list" successData
-    -- in
-    --case rankings of
-    -- RemoteData.Success successData ->
-    --     List.map .id
-    --         (Html.text successData)
-    -- RemoteData.Success actualRankings ->
-    --     div []
-    --         [ h3 [] [ text "Select Ranking" ]
-    --         , table []
-    --             ([ viewTableHeader ] ++ List.map .id actualRankings)
-    --         ]
-    -- _ ->
-    --     []
-    -- parsedUrl =
-    --     Parser.parse matchRouteParser url
-    --
-    -- _ =
-    --     Debug.log "parsed url" parsedUrl
-    --in
     case rankings of
         RemoteData.NotAsked ->
             text ""
@@ -184,17 +147,17 @@ viewRankings rankings =
             h3 [] [ text "Loading..." ]
 
         RemoteData.Success actualRankings ->
-            let
-                temp =
-                    List.map .id actualRankings
-
-                _ =
-                    Debug.log "actualRankings" temp
-            in
+            -- let
+            --     temp =
+            --         List.map .id actualRankings
+            --
+            --     _ =
+            --         Debug.log "actualRankings" temp
+            -- in
             div []
                 [ h3 [] [ text "Select Ranking" ]
                 , table []
-                    ([ viewTableHeader ] ++ List.map viewRankingIdPath actualRankings)
+                    ([ viewTableHeader ] ++ List.map viewTableBody actualRankings)
                 ]
 
         RemoteData.Failure httpError ->
@@ -215,18 +178,10 @@ viewTableHeader =
         ]
 
 
-viewRankingIdPath : Ranking -> Html Msg
-viewRankingIdPath ranking =
-    let
-        -- rankingPath =
-        --     "https://api.jsonbin.io/b/" ++ ranking.id ++ "/latest"
-        rankingPath =
-            "/" ++ ranking.id
-    in
+viewTableBody : Ranking -> Html Msg
+viewTableBody ranking =
     tr []
-        [ td [ hidden False ]
-            [ a [ href rankingPath ] [ text "View" ] ]
-        , td [ hidden True ]
+        [ td [ hidden True ]
             [ text (boolToString ranking.active) ]
         , td []
             --[ a [ href rankingPath ] [ text ranking.name ] ]
