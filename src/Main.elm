@@ -4,7 +4,7 @@ import Browser exposing (Document, UrlRequest)
 import Browser.Navigation as Nav
 import Html exposing (..)
 import Page.EditRanking as EditRanking
-import Page.ListRankings as ListRankings
+import Page.ListAll as ListAll
 import Page.NewRanking as NewRanking
 import Page.ViewRanking as ViewRanking
 import Ranking exposing (..)
@@ -34,7 +34,7 @@ type alias Model =
 
 type Page
     = NotFoundPage
-    | ListPage ListRankings.Model
+    | ListPage ListAll.Model
     | EditPage EditRanking.Model
     | NewPage NewRanking.Model
     | ViewPage ViewRanking.Model
@@ -81,12 +81,12 @@ initCurrentPage ( model, existingCmds ) =
                     ( NotFoundPage, Cmd.none )
 
                 -- This is routing the posts from the other pages
-                Route.ListRankings ->
+                Route.ListAll ->
                     -- the 'let' at this sub level actually assigns the relevant pageModel
                     -- the 'in' just returns the (Model, Cmd Msg) as per the annotation
                     let
                         ( pageModel, pageCmds ) =
-                            ListRankings.init
+                            ListAll.init
                     in
                     ( ListPage pageModel, Cmd.map ListPageMsg pageCmds )
 
@@ -130,7 +130,7 @@ currentView model =
             notFoundView
 
         ListPage pageModel ->
-            ListRankings.view pageModel
+            ListAll.view pageModel
                 |> Html.map ListPageMsg
 
         EditPage pageModel ->
@@ -157,7 +157,7 @@ update msg model =
         ( ListPageMsg subMsg, ListPage pageModel ) ->
             let
                 ( updatedPageModel, updatedCmd ) =
-                    ListRankings.update subMsg pageModel
+                    ListAll.update subMsg pageModel
             in
             ( { model | page = ListPage updatedPageModel }
             , Cmd.map ListPageMsg updatedCmd
@@ -232,7 +232,7 @@ update msg model =
 
 
 type Msg
-    = ListPageMsg ListRankings.Msg
+    = ListPageMsg ListAll.Msg
     | LinkClicked UrlRequest
     | UrlChanged Url
     | EditPageMsg EditRanking.Msg

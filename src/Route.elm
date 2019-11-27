@@ -8,7 +8,7 @@ import Url.Parser exposing (..)
 
 type Route
     = NotFound
-    | ListRankings
+    | ListAll
       --| Ranking String
     | NewRanking String
     | ViewRanking String
@@ -50,7 +50,7 @@ matchRouteParser =
             Debug.log "in matchRouteParser" temp
     in
     oneOf
-        [ map ListRankings top
+        [ map ListAll top
         , map ViewRanking (s "ranking" </> Url.Parser.string)
 
         --, map NewRanking (s "posts")
@@ -77,7 +77,7 @@ routeToString route =
         NotFound ->
             "/not-found"
 
-        ListRankings ->
+        ListAll ->
             "/"
 
         -- this is now ViewRanking - delete?

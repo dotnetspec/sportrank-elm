@@ -1,4 +1,4 @@
-module Page.ListRankings exposing (Model, Msg, init, update, view)
+module Page.ListAll exposing (Model, Msg, init, update, view)
 
 import Error exposing (buildErrorMessage)
 import Html exposing (..)
