@@ -43,32 +43,36 @@ parseUrl url =
 matchRouteParser : Parser (Route -> a) a
 matchRouteParser =
     let
-        _ =
-            Debug.log "in matchRouteParser" ViewRanking
+        temp =
+            "hello"
 
         _ =
-            Debug.log "ViewRanking" ViewRanking
+            Debug.log "in matchRouteParser" temp
     in
     oneOf
-        [ --map ListRankings (s "/" </> s (rankingIdToString postId))
-          map ListRankings top
+        [ map ListRankings top
+        , map ViewRanking (s "ranking" </> Url.Parser.string)
 
-        --map ListRankings (s (rankingIdToString RankingId))
-        , map ViewRanking (s "Page" </> Url.Parser.string)
-
-        --, map Ranking (s "posts" </> Url.Parser.string)
         --, map NewRanking (s "posts")
         ]
 
 
 pushUrl : Route -> Nav.Key -> Cmd msg
 pushUrl route navKey =
+    let
+        _ =
+            Debug.log "route in pushUrl" route
+    in
     routeToString route
         |> Nav.pushUrl navKey
 
 
 routeToString : Route -> String
 routeToString route =
+    let
+        _ =
+            Debug.log "route in routeToString" route
+    in
     case route of
         NotFound ->
             "/not-found"
@@ -83,4 +87,4 @@ routeToString route =
             "/posts/new"
 
         ViewRanking postId ->
-            "/Post" ++ postId
+            "/" ++ postId

@@ -6240,7 +6240,7 @@ var $elm$core$Platform$Cmd$map = _Platform_map;
 var $author$project$Main$initCurrentPage = function (_v0) {
 	var model = _v0.a;
 	var existingCmds = _v0.b;
-	var _v1 = $elm$core$Debug$log('in initCurrentPage');
+	var _v1 = A2($elm$core$Debug$log, 'in initCurrentPage', model);
 	var _v2 = A2($elm$core$Debug$log, 'current route', model.route);
 	var _v3 = function () {
 		var _v4 = model.route;
@@ -6435,8 +6435,8 @@ var $elm$url$Url$Parser$top = $elm$url$Url$Parser$Parser(
 			[state]);
 	});
 var $author$project$Route$matchRouteParser = function () {
-	var _v0 = A2($elm$core$Debug$log, 'in matchRouteParser', $author$project$Route$ViewRanking);
-	var _v1 = A2($elm$core$Debug$log, 'ViewRanking', $author$project$Route$ViewRanking);
+	var temp = 'hello';
+	var _v0 = A2($elm$core$Debug$log, 'in matchRouteParser', temp);
 	return $elm$url$Url$Parser$oneOf(
 		_List_fromArray(
 			[
@@ -6446,7 +6446,7 @@ var $author$project$Route$matchRouteParser = function () {
 				$author$project$Route$ViewRanking,
 				A2(
 					$elm$url$Url$Parser$slash,
-					$elm$url$Url$Parser$s('Page'),
+					$elm$url$Url$Parser$s('ranking'),
 					$elm$url$Url$Parser$string))
 			]));
 }();
@@ -7119,6 +7119,8 @@ var $author$project$Main$update = F2(
 					}
 				case 'LinkClicked':
 					var urlRequest = _v0.a.a;
+					var _v2 = A2($elm$core$Debug$log, 'LinkClicked', urlRequest);
+					var _v3 = A2($elm$core$Debug$log, 'model.navKey', model.navKey);
 					if (urlRequest.$ === 'Internal') {
 						var url = urlRequest.a;
 						return _Utils_Tuple2(
@@ -7135,6 +7137,7 @@ var $author$project$Main$update = F2(
 					}
 				case 'UrlChanged':
 					var url = _v0.a.a;
+					var _v5 = A2($elm$core$Debug$log, 'UrlChanged', url);
 					var newRoute = $author$project$Route$parseUrl(url);
 					return $author$project$Main$initCurrentPage(
 						_Utils_Tuple2(
@@ -7146,9 +7149,9 @@ var $author$project$Main$update = F2(
 					if (_v0.b.$ === 'EditPage') {
 						var subMsg = _v0.a.a;
 						var pageModel = _v0.b.a;
-						var _v3 = A2($author$project$Page$EditRanking$update, subMsg, pageModel);
-						var updatedPageModel = _v3.a;
-						var updatedCmd = _v3.b;
+						var _v6 = A2($author$project$Page$EditRanking$update, subMsg, pageModel);
+						var updatedPageModel = _v6.a;
+						var updatedCmd = _v6.b;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7163,9 +7166,9 @@ var $author$project$Main$update = F2(
 					if (_v0.b.$ === 'NewPage') {
 						var subMsg = _v0.a.a;
 						var pageModel = _v0.b.a;
-						var _v4 = A2($author$project$Page$NewRanking$update, subMsg, pageModel);
-						var updatedPageModel = _v4.a;
-						var updatedCmd = _v4.b;
+						var _v7 = A2($author$project$Page$NewRanking$update, subMsg, pageModel);
+						var updatedPageModel = _v7.a;
+						var updatedCmd = _v7.b;
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7180,10 +7183,10 @@ var $author$project$Main$update = F2(
 					if (_v0.b.$ === 'ViewPage') {
 						var subMsg = _v0.a.a;
 						var pageModel = _v0.b.a;
-						var _v5 = A2($author$project$Page$ViewRanking$update, subMsg, pageModel);
-						var updatedPageModel = _v5.a;
-						var updatedCmd = _v5.b;
-						var _v6 = $elm$core$Debug$log('in ViewPageMsg');
+						var _v8 = A2($author$project$Page$ViewRanking$update, subMsg, pageModel);
+						var updatedPageModel = _v8.a;
+						var updatedCmd = _v8.b;
+						var _v9 = $elm$core$Debug$log('in ViewPageMsg');
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -7481,9 +7484,6 @@ var $author$project$Page$ListRankings$viewFetchError = function (errorMessage) {
 				$elm$html$Html$text('Error: ' + errorMessage)
 			]));
 };
-var $author$project$Page$ListRankings$ViewRanking = function (a) {
-	return {$: 'ViewRanking', a: a};
-};
 var $author$project$Page$ListRankings$boolToString = function (bool) {
 	if (bool) {
 		return 'True';
@@ -7502,6 +7502,7 @@ var $elm$html$Html$Attributes$hidden = $elm$html$Html$Attributes$boolProperty('h
 var $elm$html$Html$td = _VirtualDom_node('td');
 var $elm$html$Html$tr = _VirtualDom_node('tr');
 var $author$project$Page$ListRankings$viewTableBody = function (ranking) {
+	var rankingpath = 'ranking/' + ranking.id;
 	return A2(
 		$elm$html$Html$tr,
 		_List_Nil,
@@ -7524,15 +7525,14 @@ var $author$project$Page$ListRankings$viewTableBody = function (ranking) {
 				_List_fromArray(
 					[
 						A2(
-						$elm$html$Html$button,
+						$elm$html$Html$a,
 						_List_fromArray(
 							[
-								$elm$html$Html$Events$onClick(
-								$author$project$Page$ListRankings$ViewRanking(ranking))
+								$elm$html$Html$Attributes$href(rankingpath)
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text('Select')
+								$elm$html$Html$text(ranking.name)
 							]))
 					])),
 				A2(
@@ -7958,7 +7958,7 @@ var $author$project$Page$ViewRanking$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Edit Ranking')
+						$elm$html$Html$text('View Ranking')
 					])),
 				$author$project$Page$ViewRanking$viewRanking(model.ranking),
 				$author$project$Page$ViewRanking$viewSaveError(model.saveError)

@@ -180,17 +180,21 @@ viewTableHeader =
 
 viewTableBody : Ranking -> Html Msg
 viewTableBody ranking =
+    let
+        rankingpath =
+            "ranking/" ++ ranking.id
+    in
     tr []
         [ td [ hidden True ]
             [ text (boolToString ranking.active) ]
         , td []
-            --[ a [ href rankingPath ] [ text ranking.name ] ]
-            --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
-            [ button [ onClick (ViewRanking ranking) ] [ text "Select" ] ]
+            [ a [ href rankingpath ] [ text ranking.name ] ]
+
+        --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
+        --[ button [ onClick (ViewRanking ranking) ] [ text "Select" ] ]
         , td []
             [ text ranking.desc ]
         , td [ hidden True ]
-            --[ button [ type_ "button", onClick (DeleteRanking ranking.id) ]
             [ text "Delete" ]
         ]
 

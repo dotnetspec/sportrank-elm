@@ -46,29 +46,6 @@ init flags url navKey =
         _ =
             Debug.log "url" url
 
-        --
-        -- parsedUrl =
-        --     Parser.parse matchRouteParser url
-        --
-        -- _ =
-        --     Debug.log "parsed url" parsedUrl
-        --
-        -- parts =
-        --     Debug.log "parts" (String.split "/" url.path)
-        --
-        -- rankingid =
-        --     case
-        --         List.reverse parts |> List.head
-        --     of
-        --         Nothing ->
-        --             Nothing
-        --
-        --         Just rnkid ->
-        --             Just (RankingId rnkid)
-        --
-        -- _ =
-        --     Debug.log "rankingid" rankingid
-        --
         _ =
             Debug.log "Route.parseUrl url" Route.parseUrl url
 
@@ -90,7 +67,7 @@ initCurrentPage : ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
 initCurrentPage ( model, existingCmds ) =
     let
         _ =
-            Debug.log "in initCurrentPage"
+            Debug.log "in initCurrentPage" model
 
         _ =
             Debug.log "current route" model.route
@@ -113,12 +90,6 @@ initCurrentPage ( model, existingCmds ) =
                     in
                     ( ListPage pageModel, Cmd.map ListPageMsg pageCmds )
 
-                -- Route.Ranking rankingId ->
-                --     let
-                --         ( pageModel, pageCmd ) =
-                --             EditRanking.init (RankingId rankingId) model.navKey
-                --     in
-                --     ( EditPage pageModel, Cmd.map EditPageMsg pageCmd )
                 Route.NewRanking rankingId ->
                     let
                         ( pageModel, pageCmd ) =
@@ -194,6 +165,13 @@ update msg model =
 
         --Clicking a link produces a ClickLink message (that will update model) that carries a UrlRequest value.
         ( LinkClicked urlRequest, _ ) ->
+            let
+                _ =
+                    Debug.log "LinkClicked" urlRequest
+
+                _ =
+                    Debug.log "model.navKey" model.navKey
+            in
             case urlRequest of
                 Browser.Internal url ->
                     ( model
@@ -208,6 +186,10 @@ update msg model =
         --When the URL actually changes, update receives a ChangeUrl message with the new URL
         --We apply Route.parseUrl (which uses matchRouteParser) to that URL and store the route in the model.
         ( UrlChanged url, _ ) ->
+            let
+                _ =
+                    Debug.log "UrlChanged" url
+            in
             let
                 newRoute =
                     Route.parseUrl url

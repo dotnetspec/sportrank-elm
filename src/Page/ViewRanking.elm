@@ -159,7 +159,7 @@ savePost post =
 view : Model -> Html Msg
 view model =
     div []
-        [ h3 [] [ text "Edit Ranking" ]
+        [ h3 [] [ text "View Ranking" ]
         , viewRanking model.ranking
         , viewSaveError model.saveError
         ]
