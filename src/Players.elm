@@ -1,4 +1,4 @@
-module Ladder exposing (Ladder, LadderId(..), emptyLadder, emptyLadderId, ladderDecoder)
+module Players exposing (Player, PlayerId(..), emptyPlayer, emptyPlayerId, ladderOfPlayersDecoder, playerDecoder, playerEncoder)
 
 import Json.Decode as Decode exposing (Decoder, bool, int, list, string)
 import Json.Decode.Pipeline exposing (required)
@@ -6,11 +6,11 @@ import Json.Encode as Encode
 import Url.Parser exposing (Parser, custom)
 
 
-type alias Ladder =
+type alias Player =
     { datestamp : Int
     , active : Bool
     , currentchallengername : String
-    , currentlchallengerid : String
+    , currentchallengerid : Int
     , address : String
     , rank : Int
     , name : String
@@ -19,8 +19,8 @@ type alias Ladder =
     }
 
 
-type LadderId
-    = LadderId Int
+type PlayerId
+    = PlayerId Int
 
 
 
@@ -30,14 +30,18 @@ type LadderId
 --   rankingid
 
 
-ladderDecoder : Decoder (List Ladder)
-ladderDecoder =
+ladderOfPlayersDecoder : Decoder (List Player)
+ladderOfPlayersDecoder =
+    let
+        _ =
+            Debug.log "in ladderDecoder" playerDecoder
+    in
     list playerDecoder
 
 
-playerDecoder : Decoder Ladder
+playerDecoder : Decoder Player
 playerDecoder =
-    Decode.succeed Ranking
+    Decode.succeed Player
         |> required "DATESTAMP" int
         |> required "ACTIVE" bool
         |> required "CURRENTCHALLENGERNAME" string
@@ -61,14 +65,40 @@ playerDecoder =
 --    "id": 2,
 --    "CURRENTCHALLENGERADDRESS": "0x48DF2ee04DFE67902B83a670281232867e5dC0Ca"
 --  },
--- rankingEncoder : Ranking -> Encode.Value
--- rankingEncoder ranking =
---     Encode.object
---         [ ( "RANKINGID", Encode.string ranking.id )
---         , ( "ACTIVE", Encode.bool ranking.active )
---         , ( "RANKINGNAME", Encode.string ranking.name )
---         , ( "RANKINGDESC", Encode.string ranking.desc )
---         ]
+
+
+playerEncoder : Player -> Encode.Value
+playerEncoder player =
+    Encode.object
+        [ ( "DATESTAMP", Encode.int player.datestamp )
+        , ( "ACTIVE"
+          , Encode.bool player.active
+          )
+        , ( "CURRENTCHALLENGERNAME"
+          , Encode.string player.currentchallengername
+          )
+        , ( "CURRENTCHALLENGERID"
+          , Encode.int player.currentchallengerid
+          )
+        , ( "ADDRESS"
+          , Encode.string player.address
+          )
+        , ( "RANK"
+          , Encode.int player.rank
+          )
+        , ( "NAME"
+          , Encode.string player.name
+          )
+        , ( "id"
+          , Encode.int player.id
+          )
+        , ( "CURRENTCHALLENGERADDRESS"
+          , Encode.string player.currentchallengeraddress
+          )
+        ]
+
+
+
 --
 --
 -- newPostEncoder : Ranking -> Encode.Value
@@ -82,12 +112,12 @@ playerDecoder =
 --
 
 
-emptyLadder : Ladder
-emptyLadder =
+emptyPlayer : Player
+emptyPlayer =
     { datestamp = 1
     , active = False
     , currentchallengername = ""
-    , currentlchallengerid = ""
+    , currentchallengerid = 0
     , address = ""
     , rank = 0
     , name = ""
@@ -96,6 +126,6 @@ emptyLadder =
     }
 
 
-emptyLadderId : LadderId
-emptyLadderId =
-    LadderId "-1"
+emptyPlayerId : PlayerId
+emptyPlayerId =
+    PlayerId -1

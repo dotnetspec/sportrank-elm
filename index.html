@@ -6207,6 +6207,52 @@ var $elm$http$Http$Header = F2(
 	});
 var $elm$http$Http$header = $elm$http$Http$Header;
 var $elm$core$Debug$log = _Debug_log;
+var $author$project$Players$Player = F9(
+	function (datestamp, active, currentchallengername, currentchallengerid, address, rank, name, id, currentchallengeraddress) {
+		return {active: active, address: address, currentchallengeraddress: currentchallengeraddress, currentchallengerid: currentchallengerid, currentchallengername: currentchallengername, datestamp: datestamp, id: id, name: name, rank: rank};
+	});
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $author$project$Players$playerDecoder = A3(
+	$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+	'CURRENTCHALLENGERADDRESS',
+	$elm$json$Json$Decode$string,
+	A3(
+		$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+		'id',
+		$elm$json$Json$Decode$int,
+		A3(
+			$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+			'NAME',
+			$elm$json$Json$Decode$string,
+			A3(
+				$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+				'RANK',
+				$elm$json$Json$Decode$int,
+				A3(
+					$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+					'ADDRESS',
+					$elm$json$Json$Decode$string,
+					A3(
+						$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+						'CURRENTCHALLENGERID',
+						$elm$json$Json$Decode$int,
+						A3(
+							$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+							'CURRENTCHALLENGERNAME',
+							$elm$json$Json$Decode$string,
+							A3(
+								$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+								'ACTIVE',
+								$elm$json$Json$Decode$bool,
+								A3(
+									$NoRedInk$elm_json_decode_pipeline$Json$Decode$Pipeline$required,
+									'DATESTAMP',
+									$elm$json$Json$Decode$int,
+									$elm$json$Json$Decode$succeed($author$project$Players$Player))))))))));
+var $author$project$Players$ladderOfPlayersDecoder = function () {
+	var _v0 = A2($elm$core$Debug$log, 'in ladderDecoder', $author$project$Players$playerDecoder);
+	return $elm$json$Json$Decode$list($author$project$Players$playerDecoder);
+}();
 var $author$project$Page$ViewRanking$fetchPost = function (_v0) {
 	var postId = _v0.a;
 	var headerKey = A2($elm$http$Http$header, 'secret-key', '$2a$10$HIPT9LxAWxYFTW.aaMUoEeIo2N903ebCEbVqB3/HEOwiBsxY3fk2i');
@@ -6217,7 +6263,7 @@ var $author$project$Page$ViewRanking$fetchPost = function (_v0) {
 			expect: A2(
 				$elm$http$Http$expectJson,
 				A2($elm$core$Basics$composeR, $krisajenkins$remotedata$RemoteData$fromResult, $author$project$Page$ViewRanking$PostReceived),
-				$author$project$Ranking$rankingDecoder),
+				$author$project$Players$ladderOfPlayersDecoder),
 			headers: _List_fromArray(
 				[headerKey]),
 			method: 'GET',
@@ -6227,11 +6273,11 @@ var $author$project$Page$ViewRanking$fetchPost = function (_v0) {
 		});
 };
 var $author$project$Page$ViewRanking$initialModel = function (navKey) {
-	return {navKey: navKey, ranking: $krisajenkins$remotedata$RemoteData$Loading, saveError: $elm$core$Maybe$Nothing};
+	return {navKey: navKey, players: $krisajenkins$remotedata$RemoteData$Loading, saveError: $elm$core$Maybe$Nothing};
 };
 var $author$project$Page$ViewRanking$init = F2(
 	function (postId, navKey) {
-		var _v0 = $elm$core$Debug$log('made it to viewRanking');
+		var _v0 = A2($elm$core$Debug$log, 'made it to viewRanking', postId);
 		return _Utils_Tuple2(
 			$author$project$Page$ViewRanking$initialModel(navKey),
 			$author$project$Page$ViewRanking$fetchPost(postId));
@@ -6991,108 +7037,15 @@ var $author$project$Page$NewRanking$update = F2(
 				}
 		}
 	});
-var $author$project$Page$ViewRanking$PostSaved = function (a) {
-	return {$: 'PostSaved', a: a};
-};
-var $author$project$Page$ViewRanking$savePost = function (post) {
-	if (post.$ === 'Success') {
-		var postData = post.a;
-		var postUrl = 'http://localhost:5019/posts/' + ('Ranking.idToString' + postData.id);
-		return $elm$http$Http$request(
-			{
-				body: $elm$http$Http$jsonBody(
-					$author$project$Ranking$rankingEncoder(postData)),
-				expect: A2($elm$http$Http$expectJson, $author$project$Page$ViewRanking$PostSaved, $author$project$Ranking$rankingDecoder),
-				headers: _List_Nil,
-				method: 'PATCH',
-				timeout: $elm$core$Maybe$Nothing,
-				tracker: $elm$core$Maybe$Nothing,
-				url: postUrl
-			});
-	} else {
-		return $elm$core$Platform$Cmd$none;
-	}
-};
 var $author$project$Page$ViewRanking$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'PostReceived':
-				var post = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{ranking: post}),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdateTitle':
-				var newTitle = msg.a;
-				var updateTitle = A2(
-					$krisajenkins$remotedata$RemoteData$map,
-					function (postData) {
-						return _Utils_update(
-							postData,
-							{active: newTitle});
-					},
-					model.ranking);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{ranking: updateTitle}),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdateAuthorName':
-				var newName = msg.a;
-				var updateAuthorName = A2(
-					$krisajenkins$remotedata$RemoteData$map,
-					function (postData) {
-						return _Utils_update(
-							postData,
-							{name: newName});
-					},
-					model.ranking);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{ranking: updateAuthorName}),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdateAuthorUrl':
-				var newUrl = msg.a;
-				var updateAuthorUrl = A2(
-					$krisajenkins$remotedata$RemoteData$map,
-					function (postData) {
-						return _Utils_update(
-							postData,
-							{desc: newUrl});
-					},
-					model.ranking);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{ranking: updateAuthorUrl}),
-					$elm$core$Platform$Cmd$none);
-			case 'SavePost':
-				return _Utils_Tuple2(
-					model,
-					$author$project$Page$ViewRanking$savePost(model.ranking));
-			default:
-				if (msg.a.$ === 'Ok') {
-					var postData = msg.a.a;
-					var post = $krisajenkins$remotedata$RemoteData$succeed(postData);
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{ranking: post, saveError: $elm$core$Maybe$Nothing}),
-						$elm$core$Platform$Cmd$none);
-				} else {
-					var error = msg.a.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								saveError: $elm$core$Maybe$Just(
-									$author$project$Error$buildErrorMessage(error))
-							}),
-						$elm$core$Platform$Cmd$none);
-				}
-		}
+		var post = msg.a;
+		var _v1 = A2($elm$core$Debug$log, 'list of players', post);
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{players: post}),
+			$elm$core$Platform$Cmd$none);
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -7803,91 +7756,6 @@ var $author$project$Page$NewRanking$view = function (model) {
 				$author$project$Page$NewRanking$viewError(model.createError)
 			]));
 };
-var $author$project$Page$ViewRanking$SavePost = {$: 'SavePost'};
-var $author$project$Page$ViewRanking$UpdateAuthorName = function (a) {
-	return {$: 'UpdateAuthorName', a: a};
-};
-var $author$project$Page$ViewRanking$UpdateAuthorUrl = function (a) {
-	return {$: 'UpdateAuthorUrl', a: a};
-};
-var $author$project$Page$ViewRanking$editForm = function (post) {
-	return A2(
-		$elm$html$Html$form,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Title'),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$value(post.name)
-							]),
-						_List_Nil)
-					])),
-				A2($elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Author Name'),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$value(post.name),
-								$elm$html$Html$Events$onInput($author$project$Page$ViewRanking$UpdateAuthorName)
-							]),
-						_List_Nil)
-					])),
-				A2($elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Author URL'),
-						A2($elm$html$Html$br, _List_Nil, _List_Nil),
-						A2(
-						$elm$html$Html$input,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('text'),
-								$elm$html$Html$Attributes$value(post.desc),
-								$elm$html$Html$Events$onInput($author$project$Page$ViewRanking$UpdateAuthorUrl)
-							]),
-						_List_Nil)
-					])),
-				A2($elm$html$Html$br, _List_Nil, _List_Nil),
-				A2(
-				$elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						$elm$html$Html$button,
-						_List_fromArray(
-							[
-								$elm$html$Html$Attributes$type_('button'),
-								$elm$html$Html$Events$onClick($author$project$Page$ViewRanking$SavePost)
-							]),
-						_List_fromArray(
-							[
-								$elm$html$Html$text('Submit')
-							]))
-					]))
-			]));
-};
 var $author$project$Page$ViewRanking$viewFetchError = function (errorMessage) {
 	var errorHeading = 'Couldn\'t fetch post at this time.';
 	return A2(
@@ -7905,6 +7773,125 @@ var $author$project$Page$ViewRanking$viewFetchError = function (errorMessage) {
 				$elm$html$Html$text('Error: ' + errorMessage)
 			]));
 };
+var $author$project$Page$ViewRanking$boolToString = function (bool) {
+	if (bool) {
+		return 'True';
+	} else {
+		return 'False';
+	}
+};
+var $author$project$Page$ViewRanking$viewTableBody = function (player) {
+	var playerpath = 'player/' + $elm$core$String$fromInt(player.id);
+	return A2(
+		$elm$html$Html$tr,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A2(
+				$elm$html$Html$td,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$hidden(true)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$author$project$Page$ViewRanking$boolToString(player.active))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$a,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$href(playerpath)
+							]),
+						_List_fromArray(
+							[
+								$elm$html$Html$text(player.name)
+							]))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(
+						$elm$core$String$fromInt(player.rank))
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$elm$html$Html$text(player.currentchallengername)
+					])),
+				A2(
+				$elm$html$Html$td,
+				_List_fromArray(
+					[
+						$elm$html$Html$Attributes$hidden(true)
+					]),
+				_List_fromArray(
+					[
+						$elm$html$Html$text('Delete')
+					]))
+			]));
+};
+var $author$project$Page$ViewRanking$viewTableHeader = A2(
+	$elm$html$Html$tr,
+	_List_Nil,
+	_List_fromArray(
+		[
+			A2(
+			$elm$html$Html$th,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$hidden(true)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('ID')
+				])),
+			A2(
+			$elm$html$Html$th,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$hidden(true)
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Active')
+				])),
+			A2(
+			$elm$html$Html$th,
+			_List_fromArray(
+				[
+					$elm$html$Html$Attributes$hidden(false),
+					$elm$html$Html$Attributes$align('left')
+				]),
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Name')
+				])),
+			A2(
+			$elm$html$Html$th,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Rank')
+				])),
+			A2(
+			$elm$html$Html$th,
+			_List_Nil,
+			_List_fromArray(
+				[
+					$elm$html$Html$text('Current Challenger')
+				]))
+		]));
 var $author$project$Page$ViewRanking$viewRanking = function (post) {
 	switch (post.$) {
 		case 'NotAsked':
@@ -7915,11 +7902,30 @@ var $author$project$Page$ViewRanking$viewRanking = function (post) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('Loading Ranking...')
+						$elm$html$Html$text('Loading Players...')
 					]));
 		case 'Success':
-			var postData = post.a;
-			return $author$project$Page$ViewRanking$editForm(postData);
+			var actualPlayers = post.a;
+			return A2(
+				$elm$html$Html$div,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$h3,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$elm$html$Html$text('Players')
+							])),
+						A2(
+						$elm$html$Html$table,
+						_List_Nil,
+						_Utils_ap(
+							_List_fromArray(
+								[$author$project$Page$ViewRanking$viewTableHeader]),
+							A2($elm$core$List$map, $author$project$Page$ViewRanking$viewTableBody, actualPlayers)))
+					]));
 		default:
 			var httpError = post.a;
 			return $author$project$Page$ViewRanking$viewFetchError(
@@ -7958,9 +7964,9 @@ var $author$project$Page$ViewRanking$view = function (model) {
 				_List_Nil,
 				_List_fromArray(
 					[
-						$elm$html$Html$text('View Ranking')
+						$elm$html$Html$text('View Ladder')
 					])),
-				$author$project$Page$ViewRanking$viewRanking(model.ranking),
+				$author$project$Page$ViewRanking$viewRanking(model.players),
 				$author$project$Page$ViewRanking$viewSaveError(model.saveError)
 			]));
 };
