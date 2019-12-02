@@ -53,7 +53,7 @@ matchRouteParser =
         [ map ListAll top
         , map ViewRanking (s "ranking" </> Url.Parser.string)
 
-        --, map NewRanking (s "posts")
+        --, map TestWeb3 (s "web3/simple")
         ]
 
 
